@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gerador Adaptativo por Dificuldade | Tapera/RS - Assistente Adm</title>
+    <style>
+        :root {
+            --primary: #065f46;
+            --primary-dark: #064e3b;
+            --primary-light: #10b981;
+            --accent: #b45309;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --highlight: #ecfdf5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: #ffffff;
+            padding: 20px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .exam-info h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .exam-info p {
+            font-size: 0.82rem;
+            color: #a7f3d0;
+            margin-top: 2px;
+        }
+
+        .timer-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Seletor de Dificuldade */
+        .diff-bar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            position: sticky;
+            top: 76px;
+            z-index: 90;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .diff-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .diff-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .diff-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .diff-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .diff-btn.active[data-diff="facil"] { background: #dcfce7; color: #166534; border-color: #86efac; }
+        .diff-btn.active[data-diff="media"] { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+        .diff-btn.active[data-diff="dificil"] { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+        .diff-btn.active[data-diff="mista"] { background: #065f46; color: #ffffff; border-color: #065f46; }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 16px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container { grid-template-columns: 1fr; }
+            .diff-bar { top: 96px; }
+        }
+
+        .section-banner {
+            background: #ffffff;
+            border-left: 6px solid var(--primary-light);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 24px 0 16px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-banner h2 {
+            font-size: 1.05rem;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .q-number {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .q-tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tag-facil { background: #dcfce7; color: #166534; }
+        .tag-media { background: #fef3c7; color: #92400e; }
+        .tag-dificil { background: #fee2e2; color: #991b1b; }
+
+        .q-text {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .q-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.9rem;
+            background: #fafafa;
+        }
+
+        .option-label:hover {
+            background: var(--highlight);
+            border-color: var(--primary-light);
+        }
+
+        .option-label input[type="radio"] {
+            margin-top: 3px;
+            margin-right: 12px;
+            accent-color: var(--primary);
+            transform: scale(1.15);
+        }
+
+        .option-label.selected {
+            background: #ecfdf5;
+            border-color: var(--primary);
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+
+        .option-label.correct-ans {
+            background: #dcfce7 !important;
+            border-color: var(--success) !important;
+            color: #14532d !important;
+            font-weight: 600;
+        }
+
+        .option-label.wrong-ans {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: #7f1d1d !important;
+            text-decoration: line-through;
+        }
+
+        .explanation-box {
+            display: none;
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border-left: 4px solid var(--primary-light);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 140px;
+            height: fit-content;
+        }
+
+        .sidebar-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .nav-btn {
+            aspect-ratio: 1;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn.answered { background: var(--primary); color: #ffffff; border-color: var(--primary); }
+        .nav-btn.correct { background: var(--success) !important; color: #ffffff !important; border-color: var(--success) !important; }
+        .nav-btn.incorrect { background: var(--danger) !important; color: #ffffff !important; border-color: var(--danger) !important; }
+
+        .finish-btn {
+            width: 100%;
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(180, 83, 9, 0.3);
+        }
+
+        .finish-btn:hover { background: #92400e; }
+
+        #results-dashboard {
+            display: none;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 20px auto 40px auto;
+            max-width: 1150px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .result-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .result-status {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-pass { background: #dcfce7; color: #15803d; border: 2px solid #86efac; }
+        .status-fail { background: #fee2e2; color: #b91c1c; border: 2px solid #fca5a5; }
+
+        .score-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .score-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .score-card h4 { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; }
+        .score-card .score-val { font-size: 1.45rem; font-weight: 800; color: var(--primary); }
+        .score-card .score-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+
+        .copy-report-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0 auto;
+            box-shadow: 0 4px 10px rgba(6, 95, 70, 0.2);
+        }
+
+        .copy-alert {
+            display: none;
+            text-align: center;
+            color: var(--success);
+            font-weight: 700;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <div class="exam-info">
+            <h1>SIMULADOR DINÂMICO FUNDATEC • TAPERA/RS</h1>
+            <p>Cargo: Assistente Administrativo | 45 Questões (A-D) | Ponderação Oficial (100 pts)</p>
+        </div>
+        <div class="timer-box" id="timer">⏱️ 03:00:00</div>
+    </div>
+</header>
+
+<div class="diff-bar">
+    <div class="diff-container">
+        <span class="diff-label">Selecione o Nível da Prova:</span>
+        <div class="diff-buttons">
+            <button class="diff-btn" data-diff="facil" onclick="setDifficulty('facil')">🟢 Fácil (Base)</button>
+            <button class="diff-btn" data-diff="media" onclick="setDifficulty('media')">🟡 Média (Padrão)</button>
+            <button class="diff-btn" data-diff="dificil" onclick="setDifficulty('dificil')">🔴 Difícil (Top 2)</button>
+            <button class="diff-btn active" data-diff="mista" onclick="setDifficulty('mista')">🎯 Mista / Prova Real</button>
+        </div>
+    </div>
+</div>
+
+<div id="results-dashboard">
+    <div class="result-header">
+        <h2>📊 Diagnóstico do Simulado Dinâmico</h2>
+        <p style="color: var(--text-muted); margin-top: 4px;">Ponderação Oficial do Edital Fundatec nº 01/2026 e Adendo nº 234/2026</p>
+        <div id="final-status-badge" class="result-status"></div>
+    </div>
+
+    <div class="score-cards-grid">
+        <div class="score-card" style="border-top: 4px solid var(--primary-light);">
+            <h4>LÍNGUA PORTUGUESA</h4>
+            <div class="score-val" id="score-port">0.0 / 30.0</div>
+            <div class="score-sub" id="acc-port">0 de 15 acertos (Peso 2.0)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #8b5cf6;">
+            <h4>MATEMÁTICA / RLM</h4>
+            <div class="score-val" id="score-logic">0.0 / 25.0</div>
+            <div class="score-sub" id="acc-logic">0 de 10 acertos (Peso 2.5)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #d97706;">
+            <h4>CONHEC. GERAIS</h4>
+            <div class="score-val" id="score-gerais">0.0 / 15.0</div>
+            <div class="score-sub" id="acc-gerais">0 de 5 acertos (Peso 3.0)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #06b6d4;">
+            <h4>LEGISLAÇÃO</h4>
+            <div class="score-val" id="score-leg">0.0 / 20.0</div>
+            <div class="score-sub" id="acc-leg">0 de 10 acertos (Peso 2.0)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #ec4899;">
+            <h4>INFORMÁTICA</h4>
+            <div class="score-val" id="score-info">0.0 / 10.0</div>
+            <div class="score-sub" id="acc-info">0 de 5 acertos (Peso 2.0)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid var(--primary-dark); background: #f0fdf4;">
+            <h4>NOTA FINAL TOTAL</h4>
+            <div class="score-val" id="score-total" style="color: #064e3b;">0.00 / 100.00</div>
+            <div class="score-sub" id="acc-total">Total: 0 de 45 questões</div>
+        </div>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 20px;">
+        <h4 style="color: var(--primary); margin-bottom: 8px;">🎯 Mapeamento de Erros e Diagnóstico:</h4>
+        <div id="analysis-feedback" style="font-size: 0.9rem; color: var(--text-main); line-height: 1.6;"></div>
+    </div>
+
+    <button class="copy-report-btn" onclick="copyDiagnostic()">📋 Copiar Relatório Oficial para Enviar ao Prompt</button>
+    <div id="copy-alert" class="copy-alert">✅ Relatório copiado para a área de transferência! Cole no chat para continuarmos o ciclo de estudos.</div>
+</div>
+
+<div class="main-container" id="exam-container">
+    <main id="questions-stream"></main>
+
+    <aside class="sidebar">
+        <div class="sidebar-card">
+            <h3>Cartão Resposta <span id="answered-count" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 400;">0/45</span></h3>
+            <div class="nav-grid" id="nav-grid"></div>
+            <button class="finish-btn" onclick="finishExam()">Entregar Prova</button>
+        </div>
+    </aside>
+</div>
+
+<script>
+// BANCO DE QUESTÕES FUNDATEC / TAPERA ADAPTADO (4 ALTERNATIVAS A-D)
+const questionBank = {
+    port: [
+        {
+            diff: "facil", topic: "Ortografia e Acentuação",
+            text: "Assinale a alternativa em que todas as palavras são proparoxítonas e acentuadas pela mesma regra gramatical:",
+            options: ["Público, burocrática, jurídica.", "Relatório, secretária, memória.", "Café, cipó, você.", "Saúde, juízes, saída."],
+            answer: 0, explanation: "'Público', 'burocrática' e 'jurídica' são proparoxítonas, sendo compulsoriamente acentuadas."
+        },
+        {
+            diff: "facil", topic: "Classes de Palavras",
+            text: "No fragmento 'A organização burocrática visa à justiça procedimental', os vocábulos 'burocrática' e 'procedimental' qualificam substantivos e classificam-se como:",
+            options: ["Substantivos próprios.", "Adjetivos.", "Advérbios de modo.", "Pronomes demonstrativos."],
+            answer: 1, explanation: "Caracterizam e restringem substantivos ('organização' e 'justiça'), atuando morfologicamente como adjetivos."
+        },
+        {
+            diff: "facil", topic: "Sintaxe do Sujeito",
+            text: "Na oração 'O assistente administrativo conferiu os comprovantes de despesa', o sujeito classifica-se sintaticamente como:",
+            options: ["Composto.", "Simples.", "Indeterminado.", "Oculto."],
+            answer: 1, explanation: "Apresenta apenas um núcleo explícito ('assistente'), tratando-se de sujeito simples."
+        },
+        {
+            diff: "facil", topic: "Semântica (Sinônimos)",
+            text: "Na frase 'O servidor agiu com presteza no balcão de atendimento', o termo destacado pode ser substituído sem alteração substancial de sentido por:",
+            options: ["Morosidade.", "Agilidade e prontidão.", "Incerteza.", "Indiferença."],
+            answer: 1, explanation: "'Presteza' denota agilidade, presteza, rapidez e zelo no cumprimento das tarefas."
+        },
+        {
+            diff: "facil", topic: "Tipologia Textual",
+            text: "Um texto que analisa um tema de interesse público, confronta opiniões e defende uma tese fundamentada classifica-se como:",
+            options: ["Narrativo.", "Descritivo.", "Dissertativo-argumentativo.", "Injuntivo."],
+            answer: 2, explanation: "Estrutura-se na apresentação de uma tese e na articulação de argumentos para convencer o leitor."
+        },
+        {
+            diff: "media", topic: "Emprego da Crase",
+            text: "Assinale a alternativa em que o uso do acento grave indicativo de crase é OBRIGATÓRIO:",
+            options: ["O requerimento foi encaminhado à Secretaria de Administração.", "O atendimento ao público ocorre de segunda a sexta-feira.", "O prefeito estava disposto a assinar a ordem de serviço.", "O documento foi remetido a uma repartição descentralizada."],
+            answer: 0, explanation: "'Encaminhado a' + 'a Secretaria' = 'à Secretaria'. Antes de verbo, artigo indefinido 'uma' e em paralelismo 'de... a' sem artigo não ocorre crase."
+        },
+        {
+            diff: "media", topic: "Concordância com Verbos Impessoais",
+            text: "Em relação à concordância de verbos impessoais, assinale a opção inteiramente CORRETA:",
+            options: ["Haviam muitos requerimentos pendentes de análise na mesa.", "Haverão novas oportunidades de concurso público neste ano.", "Fazem três meses que a nova portaria foi publicada.", "Faz três meses que a nova portaria foi publicada."],
+            answer: 3, explanation: "'Fazer' indicando tempo decorrido e 'haver' no sentido de existir são impessoais e permanecem na 3ª pessoa do singular."
+        },
+        {
+            diff: "media", topic: "Colocação Pronominal (Próclise)",
+            text: "A colocação do pronome oblíquo átono atende rigorosamente à norma culta em:",
+            options: ["Me entregaram os relatórios contábeis na recepção do prédio.", "Em se tratando de gestão de arquivos, a cautela é imperativa.", "Não informaram-nos sobre a data fixada para a posse.", "O diretor avisou que ausentar-se-ia amanhã."],
+            answer: 1, explanation: "A construção 'Em + gerúndio' atrai obrigatoriamente a próclise ('Em se tratando'). Não se inicia frase com pronome átono e palavras atrativas ('não', 'que') exigem próclise."
+        },
+        {
+            diff: "media", topic: "Pontuação (Uso da Vírgula)",
+            text: "Assinale a alternativa cuja pontuação está inteiramente em conformidade com a norma-padrão:",
+            options: ["O prefeito municipal de Tapera, assinou o decreto hoje cedo.", "Durante a sessão da câmara, os vereadores debateram o orçamento.", "Os servidores do protocolo concluíram que, os prazos eram curtos.", "A ata foi lida pelo secretário, e aprovada, por unanimidade."],
+            answer: 1, explanation: "A vírgula isola o adjunto adverbial antecipado de tempo e lugar ('Durante a sessão da câmara'). As demais separam indevidamente sujeito de predicado ou verbo de complemento."
+        },
+        {
+            diff: "media", topic: "Vozes Verbais (Transposição Passiva)",
+            text: "A transposição da oração ativa 'A equipe de engenharia avaliará as obras' para a voz passiva analítica resulta em:",
+            options: ["As obras foram avaliadas pela equipe de engenharia.", "As obras serão avaliadas pela equipe de engenharia.", "Avaliar-se-ão as obras pela equipe de engenharia.", "As obras seriam avaliadas pela equipe de engenharia."],
+            answer: 1, explanation: "Verbo no futuro do presente ('avaliará') converte-se no auxiliar 'ser' no futuro do presente plural ('serão') + particípio ('avaliadas')."
+        },
+        {
+            diff: "dificil", topic: "Concordância Verbal com Partícula SE em Locução",
+            text: "Assinale a alternativa em que a concordância verbal com a partícula 'se' atende RIGOROSAMENTE à norma-padrão:",
+            options: ["Encaminhou-se ontem aos setores competentes todos os processos licitatórios.", "Devem-se fiscalizar com rigor as obras de pavimentação urbana do município.", "Tratam-se de certidões administrativas de extrema relevância institucional.", "Constatou-se, após detalhada auditoria, várias inconsistências contábeis."],
+            answer: 1, explanation: "Em 'Devem-se fiscalizar [...] as obras', temos voz passiva sintética com locução verbal; o sujeito paciente é 'as obras' (plural), exigindo o auxiliar no plural ('devem-se fiscalizar')."
+        },
+        {
+            diff: "dificil", topic: "Regência Verbal (Lembrar e Informar)",
+            text: "Assinale a opção em que a regência verbal atende integralmente à gramática normativa:",
+            options: ["A inobservância das normas de segurança implicará em penalidades funcionais.", "O secretário municipal lembrou o compromisso assumido perante a comunidade.", "A comissão organizadora informou aos candidatos de que o gabarito seria retificado.", "O candidato esqueceu do horário de fechamento dos portões do concurso."],
+            answer: 1, explanation: "'Lembrar' e 'esquecer' sem pronome reflexivo são Transitivos Diretos: 'lembrou o compromisso'. 'Implicar' (acarretar) não aceita 'em'. 'Informar' rejeita dois objetos indiretos com preposição."
+        },
+        {
+            diff: "dificil", topic: "Conjunções Subordinativas (Conquanto vs Porquanto)",
+            text: "Na oração 'O projeto foi homologado, conquanto persistissem divergências entre os técnicos', a conjunção destacada estabelece relação de:",
+            options: ["Concessão.", "Causa.", "Consequência.", "Condição."],
+            answer: 0, explanation: "'Conquanto' é conjunção subordinativa concessiva (equivale a 'embora', 'ainda que', 'apesar de que')."
+        },
+        {
+            diff: "dificil", topic: "Colocação Pronominal (Futuro e Mesóclise)",
+            text: "Assinale a alternativa em que a colocação pronominal foi empregada em DESACORDO com as regras gramaticais:",
+            options: ["Conceder-se-á ampla vista dos autos a qualquer munícipe interessado.", "Jamais nos esqueceremos das diretrizes fixadas no Plano Diretor.", "O prefeito convidará-nos para a inauguração da nova praça esportiva.", "Quem lhe transmitiu a orientação sobre o preenchimento da folha de presença?"],
+            answer: 2, explanation: "Com verbos no Futuro do Presente ('convidará') ou Futuro do Pretérito, não se admite ênclise em hipótese alguma. Sem palavra atrativa prévia, a mesóclise é obrigatória: 'convidar-nos-á'."
+        },
+        {
+            diff: "dificil", topic: "Figuras de Linguagem (Metonímia)",
+            text: "Assinale a alternativa em que ocorre a figura de linguagem denominada metonímia:",
+            options: ["A prefeitura adquiriu trinta novos Ford para a renovação da frota escolar.", "A brisa primaveril sussurrava versos de esperança pelas avenidas.", "O candidato esperou séculos até a publicação da lista definitiva.", "Sua resposta dura desceu como um doce bálsamo sobre os presentes."],
+            answer: 0, explanation: "Em 'adquiriu trinta novos Ford', emprega-se a marca em lugar do produto (veículos), clássica metonímia."
+        }
+    ],
+    logic: [
+        {
+            diff: "facil", topic: "Proposições Lógicas",
+            text: "Assinale a alternativa que apresenta uma sentença que constitui formalmente uma proposição lógica:",
+            options: ["Feche a porta do gabinete.", "Quantos servidores trabalham neste setor?", "O número 7 é um número primo ímpar.", "Que dia agradável para a realização da prova!"],
+            answer: 2, explanation: "Sentenças declarativas que admitem valor verdadeiro ou falso são proposições lógicas. Frases imperativas, interrogativas e exclamativas não são proposições."
+        },
+        {
+            diff: "facil", topic: "Regra de Três Simples",
+            text: "Uma torneira com vazão constante despeja 50 litros de água em 15 minutos. Quanto tempo levará para despejar 200 litros?",
+            options: ["30 minutos.", "45 minutos.", "60 minutos (1 hora).", "75 minutos."],
+            answer: 2, explanation: "Proporção direta: 50 L em 15 min => 200 L (4 vezes mais) levará 4 × 15 min = 60 minutos (1 hora)."
+        },
+        {
+            diff: "facil", topic: "Porcentagem Direta",
+            text: "Um pacote contém 60 fichas de protocolo. Se 12 dessas fichas vieram repetidas, qual é a porcentagem de fichas repetidas?",
+            options: ["15%.", "20%.", "25%.", "30%."],
+            answer: 1, explanation: "Porcentagem = (12 / 60) × 100% = 1/5 × 100% = 20%."
+        },
+        {
+            diff: "media", topic: "Negação da Condicional (MANÉ)",
+            text: "A negação lógica de 'Se o candidato obtiver mais de 50 pontos, então será aprovado no concurso de Tapera' é:",
+            options: ["Se o candidato não obtiver mais de 50 pontos, então não será aprovado.", "O candidato obtém mais de 50 pontos e não é aprovado no concurso de Tapera.", "O candidato não obtém mais de 50 pontos ou é aprovado no concurso.", "Se o candidato for aprovado, então obteve mais de 50 pontos."],
+            answer: 1, explanation: "A negação de P → Q é dada pela regra do MANÉ: Mantém a primeira E Nega a segunda (P ∧ ~Q)."
+        },
+        {
+            diff: "media", topic: "Teorema de Tales Proporcional",
+            text: "Em retas paralelas cortadas por duas transversais, os segmentos na primeira medem 8 cm e 40 cm. Na segunda, o correspondente ao de 8 cm mede x, e o correspondente ao de 40 cm mede 50 cm. O valor de x é:",
+            options: ["8 cm.", "10 cm.", "12 cm.", "15 cm."],
+            answer: 1, explanation: "Pelo Teorema de Tales: 8 / 40 = x / 50 => 1 / 5 = x / 50 => 5x = 50 => x = 10 cm."
+        },
+        {
+            diff: "media", topic: "Juros Simples",
+            text: "Qual é o montante produzido pela aplicação de um capital de R$ 30.000,00, a juros simples, com taxa de 1% ao mês, durante 4 meses (dois bimestres)?",
+            options: ["R$ 31.000,00.", "R$ 31.200,00.", "R$ 31.500,00.", "R$ 32.400,00."],
+            answer: 1, explanation: "Juros = C × i × t = 30.000 × 0,01 × 4 = R$ 1.200,00. Montante = C + J = 30.000 + 1.200 = R$ 31.200,00."
+        },
+        {
+            diff: "media", topic: "Conjuntos (Interseção Dupla)",
+            text: "Em um departamento com 60 servidores, 35 utilizam transporte coletivo, 25 utilizam veículo próprio e 8 não utilizam nenhum desses meios. Quantos utilizam AMBOS os meios?",
+            options: ["6 servidores.", "8 servidores.", "10 servidores.", "12 servidores."],
+            answer: 1, explanation: "Total que utiliza ao menos um = 60 - 8 = 52. n(A ∪ B) = n(A) + n(B) - n(A ∩ B) => 52 = 35 + 25 - x => 52 = 60 - x => x = 8 servidores."
+        },
+        {
+            diff: "dificil", topic: "Equivalência Contrapositiva com Negações",
+            text: "Dada a condicional 'Se o candidato não comparecer no horário estipulado, então será eliminado do concurso de Tapera', a sua contrapositiva equivalente é:",
+            options: ["Se o candidato for eliminado do concurso de Tapera, então ele não compareceu no horário.", "Se o candidato não for eliminado do concurso de Tapera, então ele compareceu no horário estipulado.", "Se o candidato comparecer no horário estipulado, então não será eliminado do concurso.", "O candidato não comparece no horário estipulado e não é eliminado do concurso."],
+            answer: 1, explanation: "Dada (~P → Q), sua contrapositiva inverte e nega ambas: ~Q → ~(~P), resultando em (~Q → P): 'Se NÃO for eliminado, então COMPARECEU'."
+        },
+        {
+            diff: "dificil", topic: "Geometria e Trigonometria (Teorema de Pitágoras)",
+            text: "Para inspecionar o topo da parede de um prédio público em Tapera, uma escada de 10 metros foi apoiada no solo a 6 metros da parede vertical. A altura da parede até onde a escada se apoia é:",
+            options: ["7 metros.", "8 metros.", "8,5 metros.", "9 metros."],
+            answer: 1, explanation: "Pelo Teorema de Pitágoras: h² + 6² = 10² => h² + 36 = 100 => h² = 64 => h = 8 metros."
+        },
+        {
+            diff: "dificil", topic: "Geometria Espacial (Volume de Paralelepípedo em Litros)",
+            text: "Uma caixa d'água municipal em formato de paralelepípedo reto-retângulo tem 3 metros de comprimento, 2 metros de largura e 1,5 metro de altura. Sabendo que 1 m³ = 1.000 litros, sua capacidade é:",
+            options: ["6.500 litros.", "8.000 litros.", "9.000 litros.", "12.000 litros."],
+            answer: 2, explanation: "Volume = 3 m × 2 m × 1,5 m = 9 m³. Como 1 m³ = 1.000 L, a capacidade é 9.000 litros."
+        }
+    ],
+    gerais: [
+        {
+            diff: "facil", topic: "Desenvolvimento Sustentável",
+            text: "O conceito fundamental de desenvolvimento sustentável estabelece que a sociedade deve:",
+            options: ["Esgotar imediatamente os recursos naturais disponíveis para gerar superávit fiscal.", "Atender às necessidades do presente sem comprometer a capacidade das gerações futuras suprirem suas necessidades.", "Paralisar todas as atividades industriais e agrícolas em territórios municipais.", "Priorizar o crescimento financeiro a curto prazo independentemente dos impactos ecológicos."],
+            answer: 1, explanation: "A definição da Comissão Brundtland (1987) define desenvolvimento sustentável como o atendimento às necessidades presentes sem comprometer as gerações futuras."
+        },
+        {
+            diff: "facil", topic: "Direitos Humanos e Cidadania",
+            text: "Os Direitos Humanos caracterizam-se fundamentalmente pelo princípio da:",
+            options: ["Renunciabilidade contratual.", "Universalidade, aplicando-se a todos os seres humanos sem qualquer distinção.", "Vigência temporária de cinco anos.", "Restrição aos cidadãos com título de eleitor ativo."],
+            answer: 1, explanation: "A universalidade é pilar basilar dos Direitos Humanos: aplicam-se a todos os indivíduos independentemente de raça, sexo, nacionalidade ou classe."
+        },
+        {
+            diff: "media", topic: "Aspectos Regionais e Geográficos de Tapera/RS",
+            text: "O Município de Tapera localiza-se na região noroeste do Estado do Rio Grande do Sul, inserido na região hidrográfica e socioeconômica do:",
+            options: ["Vale dos Sinos.", "Alto Jacuí.", "Litoral Norte.", "Fronteira Oeste."],
+            answer: 1, explanation: "Tapera situa-se na região geográfica e bacia hidrográfica do Alto Jacuí no Rio Grande do Sul."
+        },
+        {
+            diff: "media", topic: "Inclusão Social e Combate ao Capacitismo",
+            text: "A atitude preconceituosa que subestima, discrimina ou desqualifica a capacidade de pessoas com deficiência, julgando-as inferiores com base em padrões corporais normativos, denomina-se:",
+            options: ["Etarismo.", "Aporofobia.", "Capacitismo.", "Xenofobia."],
+            answer: 2, explanation: "Capacitismo é o termo que define a discriminação ou preconceito social contra pessoas com deficiência."
+        },
+        {
+            diff: "dificil", topic: "Municípios Limítrofes de Tapera/RS",
+            text: "Em relação à divisão geográfica e limites territoriais no noroeste do Rio Grande do Sul, constituem municípios que fazem divisa e integração direta com Tapera:",
+            options: ["Espumoso, Selbach, Lagoa dos Três Cantos e Não-Me-Toque.", "Passo Fundo, Erechim, Marau e Carazinho.", "Santa Maria, Cruz Alta, Júlio de Castilhos e Tupanciretã.", "Pelotas, Rio Grande, Canguçu e São Lourenço do Sul."],
+            answer: 0, explanation: "Tapera limita-se diretamente com Espumoso, Selbach, Lagoa dos Três Cantos, Não-Me-Toque e Colorado no Alto Jacuí."
+        }
+    ],
+    leg: [
+        {
+            diff: "facil", topic: "Constituição Federal - Princípios da Administração (Art. 37)",
+            text: "De acordo com o artigo 37, caput, da Constituição Federal de 1988, a administração pública obedecerá aos seguintes princípios expressos:",
+            options: ["Legalidade, impessoalidade, moralidade, publicidade e eficiência.", "Legalidade, proporcionalidade, discricionariedade e celeridade.", "Supremacia privada, impessoalidade, sigilo e economicidade.", "Moralidade, pessoalidade, conveniência e hierarquia absoluta."],
+            answer: 0, explanation: "Art. 37, caput, consagra o mnemônico LIMPE: Legalidade, Impessoalidade, Moralidade, Publicidade e Eficiência."
+        },
+        {
+            diff: "facil", topic: "Constituição Federal - Acumulação de Cargos (Art. 37, XVI)",
+            text: "Havendo compatibilidade de horários, a Constituição Federal permite excepcionalmente a acumulação remunerada de:",
+            options: ["Três cargos de professor em municípios vizinhos.", "Um cargo de professor com outro técnico ou científico.", "Dois cargos administrativos em prefeituras distintas.", "Dois cargos em comissão de livre nomeação e exoneração."],
+            answer: 1, explanation: "Art. 37, XVI, 'b': permite acumular um cargo de professor com outro técnico ou científico havendo compatibilidade de horários."
+        },
+        {
+            diff: "facil", topic: "Estatuto dos Servidores de Tapera (Lei 2.069/2003) - Provimento vs Vacância",
+            text: "Conforme a Lei Municipal nº 2.069/2003 (Estatuto dos Servidores de Tapera/RS), são formas de provimento de cargo público, EXCETO:",
+            options: ["Nomeação.", "Reintegração.", "Reversão.", "Exoneração."],
+            answer: 3, explanation: "Exoneração é forma de VACÂNCIA (desocupação do cargo), e não de provimento. Nomeação, reintegração e reversão são formas de provimento."
+        },
+        {
+            diff: "media", topic: "Lei Maria da Penha (Lei nº 11.340/2006) - Formas de Violência",
+            text: "A Lei Maria da Penha (art. 7º) tipifica expressamente como formas de violência doméstica e familiar contra a mulher a violência física, psicológica, sexual, patrimonial e a violência:",
+            options: ["Moral (calúnia, difamação ou injúria).", "Institucional tributária.", "Econômica cambial.", "Disciplinar funcional."],
+            answer: 0, explanation: "O art. 7º, V, da Lei 11.340/2006 elenca a violência moral, entendida como conduta que configure calúnia, difamação ou injúria contra a mulher."
+        },
+        {
+            diff: "media", topic: "Estatuto da Pessoa Idosa (Lei Federal nº 10.741/2003)",
+            text: "De acordo com o Estatuto da Pessoa Idosa (art. 3º, § 2º), entre as pessoas idosas é assegurada prioridade especial de atendimento aos:",
+            options: ["Maiores de 65 anos.", "Maiores de 70 anos.", "Maiores de 80 anos, com preferência sobre os demais idosos.", "Aposentados com mais de 35 anos de serviço."],
+            answer: 2, explanation: "O art. 3º, § 2º, estabelece a 'superprioridade': dentre os idosos, é assegurada prioridade especial aos maiores de 80 (oitenta) anos sobre os demais idosos."
+        },
+        {
+            diff: "media", topic: "Estatuto da Pessoa com Deficiência (Lei nº 13.146/2015)",
+            text: "A condição de alcance para utilização, com segurança e autonomia, de espaços, mobiliários, edificações e serviços públicos pelo cidadão com deficiência define o conceito de:",
+            options: ["Adaptação razoável.", "Acessibilidade.", "Desenho universal restrito.", "Tecnologia assistiva compulsória."],
+            answer: 1, explanation: "Art. 3º, I, da Lei 13.146/2015 define legalmente o conceito basilar de Acessibilidade."
+        },
+        {
+            diff: "media", topic: "CF/88 - Responsabilidade Civil do Estado (Art. 37, § 6º e Tema 940 STF)",
+            text: "O munícipe lesado por acidente causado por servidor municipal em viatura a serviço deve propor a ação indenizatória:",
+            options: ["Contra o Município (responsabilidade objetiva), cabendo ação regressiva contra o servidor nos casos de dolo ou culpa.", "Exclusivamente contra a pessoa física do servidor.", "Contra o servidor e o Município em litisconsórcio passivo obrigatório.", "Contra o Estado do RS de forma subsidiária."],
+            answer: 0, explanation: "STF - Tema 940: A ação indenizatória deve ser ajuizada contra a pessoa jurídica pública (responsabilidade objetiva), cabendo ação regressiva subjetiva contra o servidor."
+        },
+        {
+            diff: "dificil", topic: "Lei de Improbidade (Lei 8.429/92) - Dolo Específico (Art. 1º)",
+            text: "Conforme a Lei nº 8.429/1992 com a reforma da Lei nº 14.230/2021, o mero exercício da função pública ou desempenho de competências sem comprovação de ato doloso com fim ilícito:",
+            options: ["Configura improbidade na modalidade culposa grave.", "Afasta expressamente a responsabilidade por ato de improbidade administrativa.", "Gera aplicação sumária de multa civil disciplinar.", "Transfere a responsabilidade para a chefia imediata."],
+            answer: 1, explanation: "Art. 1º, § 3º: O mero exercício da função sem comprovação de dolo com fim ilícito afasta a responsabilidade por ato de improbidade administrativa."
+        },
+        {
+            diff: "dificil", topic: "Lei de Improbidade (Lei 8.429/92) - Sanções dos Princípios (Art. 12, III)",
+            text: "Ao responsável por ato de improbidade que atenta contra os princípios da administração pública (art. 11), a Lei nº 8.429/1992 prevê:",
+            options: ["Não mais se aplicam perda da função pública nem suspensão de direitos políticos, aplicando-se apenas multa civil de até 24 vezes e proibição de contratar por até 4 anos.", "Suspensão compulsória dos direitos políticos por 10 anos.", "Demissão automática com reclusão de 2 a 6 anos.", "Perda de bens particulares adquiridos antes do concurso."],
+            answer: 0, explanation: "A Lei 14.230/2021 excluiu a perda da função pública e a suspensão dos direitos políticos para os atos do art. 11 (princípios)."
+        },
+        {
+            diff: "dificil", topic: "Lei de Improbidade (Lei 8.429/92) - Prescrição Geral e Intercorrente (Art. 23)",
+            text: "Conforme o artigo 23 da Lei nº 8.429/1992, o prazo prescricional geral da ação de improbidade e o prazo de prescrição intercorrente são, respectivamente, de:",
+            options: ["5 anos e 2 anos.", "8 anos e 4 anos.", "10 anos e 5 anos.", "Imprescritível e 3 anos."],
+            answer: 1, explanation: "Art. 23: Prescreve em 8 anos do fato. A prescrição intercorrente após o ajuizamento dá-se em 4 anos (art. 23, § 5º)."
+        }
+    ],
+    info: [
+        {
+            diff: "facil", topic: "Windows 10/11 - Teclas de Atalho de Janelas",
+            text: "No ambiente Microsoft Windows 10 e 11, o atalho de teclado utilizado para alternar rapidamente entre os aplicativos e janelas abertas é:",
+            options: ["Alt + Tab", "Ctrl + Shift + Esc", "Windows + L", "Ctrl + P"],
+            answer: 0, explanation: "Alt + Tab alterna entre aplicativos abertos na Área de Trabalho."
+        },
+        {
+            diff: "facil", topic: "Microsoft Word 365 - Formatação Básica",
+            text: "No Microsoft Word 365 em português, para aplicar formatação em Negrito ao texto selecionado, o atalho padrão é:",
+            options: ["Ctrl + N", "Ctrl + B", "Ctrl + I", "Ctrl + S"],
+            answer: 0, explanation: "No Word em português brasileiro: Ctrl + N aplica Negrito (Ctrl+B é Salvar; Ctrl+I é Itálico; Ctrl+S é Sublinhado)."
+        },
+        {
+            diff: "media", topic: "Microsoft Word 365 - Localizar e Substituir",
+            text: "No Microsoft Word 365 em português brasileiro, o atalho utilizado para abrir diretamente a caixa de diálogo para Substituir texto é:",
+            options: ["Ctrl + L", "Ctrl + U", "Ctrl + H", "Ctrl + S"],
+            answer: 1, explanation: "No Word em português: Ctrl + U aciona o comando 'Substituir' (enquanto Ctrl + L aciona 'Localizar')."
+        },
+        {
+            diff: "media", topic: "Microsoft Excel 365 - Função CONT.SE",
+            text: "No Microsoft Excel 365, a função utilizada para contar quantas células em um intervalo atendem a um critério específico pré-estabelecido é a:",
+            options: ["SOMASE", "CONT.SE", "MÉDIASE", "PROCV"],
+            answer: 1, explanation: "CONT.SE(intervalo; critérios) conta o número de células que satisfazem a condição."
+        },
+        {
+            diff: "dificil", topic: "Excel 365 - Função Lógica SE com E Aninhado",
+            text: "No Excel 365, se a célula A1=70 e B1=50, a fórmula =SE(E(A1>=60; B1>=60); \"Aprovado\"; \"Revisar\") exibirá o resultado:",
+            options: ["Aprovado", "Revisar", "#VALOR!", "VERDADEIRO"],
+            answer: 1, explanation: "A função E exige que ambas as condições sejam verdadeiras. Como B1=50 não é maior ou igual a 60, resulta em FALSO, retornando 'Revisar'."
+        }
+    ]
+};
+
+let currentQuestions = [];
+let userAnswers = {};
+let timerSeconds = 3 * 3600;
+let timerInterval = null;
+let isSubmitted = false;
+let currentDifficultyMode = "mista";
+
+function setDifficulty(mode) {
+    if (Object.keys(userAnswers).length > 0 && !isSubmitted) {
+        const c = confirm("Ao alterar a dificuldade, as respostas atuais serão reiniciadas. Deseja continuar?");
+        if (!c) return;
+    }
+
+    currentDifficultyMode = mode;
+
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-diff') === mode) {
+            btn.classList.add('active');
+        }
+    });
+
+    generateExamForDifficulty(mode);
+}
+
+function generateExamForDifficulty(mode) {
+    userAnswers = {};
+    isSubmitted = false;
+    document.getElementById('results-dashboard').style.display = 'none';
+
+    // Composition requirements per Tapera/RS Assistant Administrative:
+    // port: 15, logic: 10, gerais: 5, leg: 10, info: 5 => Total 45
+    const reqs = { port: 15, logic: 10, gerais: 5, leg: 10, info: 5 };
+    const weights = { port: 2.00, logic: 2.50, gerais: 3.00, leg: 2.00, info: 2.00 };
+    const subjectNames = {
+        port: "Língua Portuguesa",
+        logic: "Matemática / Raciocínio Lógico",
+        gerais: "Conhecimentos Gerais",
+        leg: "Legislação",
+        info: "Informática"
+    };
+
+    currentQuestions = [];
+    let qGlobalId = 1;
+
+    for (const [subj, count] of Object.entries(reqs)) {
+        const pool = questionBank[subj];
+        let selectedSubjQuestions = [];
+
+        if (mode === "facil" || mode === "media" || mode === "dificil") {
+            const filtered = pool.filter(q => q.diff === mode);
+            // If filtered is smaller than count, fill with adjacent difficulty
+            selectedSubjQuestions = [...filtered];
+            if (selectedSubjQuestions.length < count) {
+                const others = pool.filter(q => q.diff !== mode);
+                while (selectedSubjQuestions.length < count) {
+                    for (const o of others) {
+                        if (selectedSubjQuestions.length < count) selectedSubjQuestions.push(o);
+                    }
+                    if (others.length === 0) {
+                        for (const f of filtered) {
+                            if (selectedSubjQuestions.length < count) selectedSubjQuestions.push(f);
+                        }
+                    }
+                }
+            }
+        } else {
+            // Mista: Balanced representation across pool
+            while (selectedSubjQuestions.length < count) {
+                for (const q of pool) {
+                    if (selectedSubjQuestions.length < count) selectedSubjQuestions.push(q);
+                }
+            }
+        }
+
+        selectedSubjQuestions.slice(0, count).forEach(q => {
+            currentQuestions.push({
+                id: qGlobalId++,
+                subject: subj,
+                subjectName: subjectNames[subj],
+                topic: q.topic,
+                weight: weights[subj],
+                difficulty: q.diff,
+                text: q.text,
+                options: q.options,
+                answer: q.answer,
+                explanation: q.explanation
+            });
+        });
+    }
+
+    renderQuestions();
+    renderNav();
+    resetTimer();
+}
+
+function renderQuestions() {
+    const stream = document.getElementById('questions-stream');
+    stream.innerHTML = '';
+    let currentSubject = '';
+
+    currentQuestions.forEach(q => {
+        if (q.subject !== currentSubject) {
+            currentSubject = q.subject;
+            const banner = document.createElement('div');
+            banner.className = 'section-banner';
+            banner.innerHTML = `
+                <h2>
+                    <span>${q.subjectName}</span>
+                    <span class="section-badge">Peso por Questão: ${q.weight.toFixed(2)} pts</span>
+                </h2>
+            `;
+            stream.appendChild(banner);
+        }
+
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `q-card-${q.id}`;
+
+        const letters = ['A', 'B', 'C', 'D'];
+        let optionsHtml = '';
+        q.options.forEach((opt, oIdx) => {
+            optionsHtml += `
+                <label class="option-label" id="label-${q.id}-${oIdx}" onclick="selectOption(${q.id}, ${oIdx})">
+                    <input type="radio" name="question-${q.id}" value="${oIdx}">
+                    <span><strong>${letters[oIdx]})</strong> ${opt}</span>
+                </label>
+            `;
+        });
+
+        const diffTags = {
+            facil: '<span class="q-tag tag-facil">Fácil</span>',
+            media: '<span class="q-tag tag-media">Média</span>',
+            dificil: '<span class="q-tag tag-dificil">Difícil</span>'
+        };
+
+        card.innerHTML = `
+            <div class="q-header">
+                <span class="q-number">Questão ${q.id} <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">• ${q.topic}</span></span>
+                <div>
+                    ${diffTags[q.difficulty] || ''}
+                    <span class="q-weight" style="margin-left: 6px;">Valor: ${q.weight.toFixed(2)} pts</span>
+                </div>
+            </div>
+            <div class="q-text">${q.text}</div>
+            <div class="q-options">${optionsHtml}</div>
+            <div class="explanation-box" id="exp-${q.id}">
+                <strong>💡 Justificativa Fundatec:</strong><br>
+                ${q.explanation}
+            </div>
+        `;
+        stream.appendChild(card);
+    });
+}
+
+function renderNav() {
+    const grid = document.getElementById('nav-grid');
+    grid.innerHTML = '';
+    currentQuestions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.id = `nav-btn-${q.id}`;
+        btn.innerText = q.id;
+        btn.onclick = () => {
+            document.getElementById(`q-card-${q.id}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+        grid.appendChild(btn);
+    });
+    document.getElementById('answered-count').innerText = `0/45`;
+}
+
+function selectOption(qId, optIdx) {
+    if (isSubmitted) return;
+    userAnswers[qId] = optIdx;
+
+    for (let i = 0; i < 4; i++) {
+        const lbl = document.getElementById(`label-${qId}-${i}`);
+        if (lbl) lbl.classList.remove('selected');
+    }
+    const selectedLbl = document.getElementById(`label-${qId}-${optIdx}`);
+    if (selectedLbl) {
+        selectedLbl.classList.add('selected');
+        const radio = selectedLbl.querySelector('input');
+        if (radio) radio.checked = true;
+    }
+
+    const navBtn = document.getElementById(`nav-btn-${qId}`);
+    if (navBtn) navBtn.classList.add('answered');
+
+    const count = Object.keys(userAnswers).length;
+    document.getElementById('answered-count').innerText = `${count}/45`;
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerSeconds = 3 * 3600;
+    const timerElem = document.getElementById('timer');
+    timerElem.innerText = "⏱️ 03:00:00";
+    timerElem.classList.remove('warning');
+
+    timerInterval = setInterval(() => {
+        if (timerSeconds <= 0) {
+            clearInterval(timerInterval);
+            finishExam();
+            return;
+        }
+        timerSeconds--;
+        const h = Math.floor(timerSeconds / 3600);
+        const m = Math.floor((timerSeconds % 3600) / 60);
+        const s = timerSeconds % 60;
+        timerElem.innerText = `⏱️ ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (timerSeconds <= 600) timerElem.classList.add('warning');
+    }, 1000);
+}
+
+let missedTopics = [];
+
+function finishExam() {
+    if (isSubmitted) return;
+    const answeredCount = Object.keys(userAnswers).length;
+    if (answeredCount < 45) {
+        const c = confirm(`Você respondeu ${answeredCount} de 45 questões. Deseja realmente finalizar o simulado?`);
+        if (!c) return;
+    }
+
+    isSubmitted = true;
+    clearInterval(timerInterval);
+
+    let totalScore = 0;
+    missedTopics = [];
+    let scores = {
+        port: { correct: 0, total: 15, weight: 2.00, points: 0 },
+        logic: { correct: 0, total: 10, weight: 2.50, points: 0 },
+        gerais: { correct: 0, total: 5, weight: 3.00, points: 0 },
+        leg: { correct: 0, total: 10, weight: 2.00, points: 0 },
+        info: { correct: 0, total: 5, weight: 2.00, points: 0 }
+    };
+
+    currentQuestions.forEach(q => {
+        const userChoice = userAnswers[q.id];
+        const isCorrect = userChoice === q.answer;
+        const navBtn = document.getElementById(`nav-btn-${q.id}`);
+        const expBox = document.getElementById(`exp-${q.id}`);
+        if (expBox) expBox.style.display = 'block';
+
+        for (let i = 0; i < 4; i++) {
+            const lbl = document.getElementById(`label-${q.id}-${i}`);
+            if (lbl) {
+                if (i === q.answer) lbl.classList.add('correct-ans');
+                else if (i === userChoice && !isCorrect) lbl.classList.add('wrong-ans');
+            }
+        }
+
+        if (isCorrect) {
+            scores[q.subject].correct++;
+            scores[q.subject].points += q.weight;
+            totalScore += q.weight;
+            if (navBtn) navBtn.className = 'nav-btn correct';
+        } else {
+            missedTopics.push({ id: q.id, subject: q.subjectName, topic: q.topic });
+            if (navBtn) navBtn.className = 'nav-btn incorrect';
+        }
+    });
+
+    document.getElementById('score-port').innerText = `${scores.port.points.toFixed(2)} / 30.00`;
+    document.getElementById('acc-port').innerText = `${scores.port.correct} de 15 acertos (${(scores.port.correct/15*100).toFixed(0)}%)`;
+
+    document.getElementById('score-logic').innerText = `${scores.logic.points.toFixed(2)} / 25.00`;
+    document.getElementById('acc-logic').innerText = `${scores.logic.correct} de 10 acertos (${(scores.logic.correct/10*100).toFixed(0)}%)`;
+
+    document.getElementById('score-gerais').innerText = `${scores.gerais.points.toFixed(2)} / 15.00`;
+    document.getElementById('acc-gerais').innerText = `${scores.gerais.correct} de 5 acertos (${(scores.gerais.correct/5*100).toFixed(0)}%)`;
+
+    document.getElementById('score-leg').innerText = `${scores.leg.points.toFixed(2)} / 20.00`;
+    document.getElementById('acc-leg').innerText = `${scores.leg.correct} de 10 acertos (${(scores.leg.correct/10*100).toFixed(0)}%)`;
+
+    document.getElementById('score-info').innerText = `${scores.info.points.toFixed(2)} / 10.00`;
+    document.getElementById('acc-info').innerText = `${scores.info.correct} de 5 acertos (${(scores.info.correct/5*100).toFixed(0)}%)`;
+
+    document.getElementById('score-total').innerText = `${totalScore.toFixed(2)} / 100.00`;
+    const totalCorrect = scores.port.correct + scores.logic.correct + scores.gerais.correct + scores.leg.correct + scores.info.correct;
+    document.getElementById('acc-total').innerText = `Total: ${totalCorrect} de 45 questões (${(totalCorrect/45*100).toFixed(1)}%)`;
+
+    const hasZero = scores.port.correct === 0 || scores.logic.correct === 0 || scores.gerais.correct === 0 || scores.leg.correct === 0 || scores.info.correct === 0;
+    const isApproved = totalScore >= 50.00 && !hasZero;
+    const badge = document.getElementById('final-status-badge');
+
+    if (isApproved) {
+        if (totalScore >= 85.00) {
+            badge.className = 'result-status status-pass';
+            badge.innerText = `🏆 APROVADO COM DESEMPENHO TOP 2 (${totalScore.toFixed(2)} pts)`;
+        } else {
+            badge.className = 'result-status status-pass';
+            badge.innerText = `✅ APROVADO NA NOTA DE CORTE (${totalScore.toFixed(2)} pts)`;
+        }
+    } else {
+        badge.className = 'result-status status-fail';
+        if (hasZero) badge.innerText = `❌ ELIMINADO: ZEROU UMA DISCIPLINA (${totalScore.toFixed(2)} pts)`;
+        else badge.innerText = `❌ REPROVADO: ABAIXO DE 50 PONTOS (${totalScore.toFixed(2)} pts)`;
+    }
+
+    let feedbackHtml = "<p><strong>Resumo de Erros por Disciplina:</strong></p><ul style='margin-left: 20px; margin-top: 6px;'>";
+    if (missedTopics.length === 0) {
+        feedbackHtml += "<li>🎉 Gabarito 100% perfeito! Sem tópicos pendentes.</li>";
+    } else {
+        missedTopics.forEach(t => {
+            feedbackHtml += `<li><strong>Q${t.id} (${t.subject}):</strong> ${t.topic}</li>`;
+        });
+    }
+    feedbackHtml += "</ul>";
+    document.getElementById('analysis-feedback').innerHTML = feedbackHtml;
+
+    const dashboard = document.getElementById('results-dashboard');
+    dashboard.style.display = 'block';
+    dashboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyDiagnostic() {
+    let missedSummary = "";
+    if (missedTopics.length === 0) {
+        missedSummary = "Nenhum erro registrado (100% de acertos).";
+    } else {
+        missedSummary = missedTopics.map(t => `- Q${t.id} [${t.subject}]: ${t.topic}`).join("\\n");
+    }
+
+    const report = `RELATÓRIO DE DESEMPENHO (Simulador Dinâmico - Nível ${currentDifficultyMode.toUpperCase()} - Tapera/RS):
+- Língua Portuguesa: ${document.getElementById('acc-port').innerText} (${document.getElementById('score-port').innerText})
+- Matemática / RLM: ${document.getElementById('acc-logic').innerText} (${document.getElementById('score-logic').innerText})
+- Conhecimentos Gerais: ${document.getElementById('acc-gerais').innerText} (${document.getElementById('score-gerais').innerText})
+- Legislação: ${document.getElementById('acc-leg').innerText} (${document.getElementById('score-leg').innerText})
+- Informática: ${document.getElementById('acc-info').innerText} (${document.getElementById('score-info').innerText})
+- NOTA FINAL: ${document.getElementById('score-total').innerText}
+- STATUS: ${document.getElementById('final-status-badge').innerText}
+
+LISTA DE TÓPICOS ERRADOS:
+${missedSummary}
+
+Com base nestes erros, vamos seguir ajustando os pontos fracos.`;
+
+    navigator.clipboard.writeText(report).then(() => {
+        const alertBox = document.getElementById('copy-alert');
+        alertBox.style.display = 'block';
+        setTimeout(() => alertBox.style.display = 'none', 5000);
+    });
+}
+
+window.onload = () => generateExamForDifficulty("mista");
+</script>
+</body>
+</html>

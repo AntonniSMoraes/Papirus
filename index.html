@@ -43,10 +43,7 @@
             border-bottom: 1px solid rgba(16, 185, 129, 0.2);
         }
 
-        .header-wrap {
-            max-width: 680px;
-            margin: 0 auto;
-        }
+        .header-wrap { max-width: 680px; margin: 0 auto; }
 
         .badge-target {
             display: inline-flex;
@@ -64,20 +61,9 @@
             margin-bottom: 8px;
         }
 
-        h1 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: #ffffff;
-        }
+        h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; }
+        p.subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
 
-        p.subtitle {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* Filter Tabs */
         .tabs-container {
             max-width: 680px;
             margin: 14px auto 0 auto;
@@ -118,12 +104,7 @@
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
-        /* Cards Stream */
-        .content-wrap {
-            max-width: 680px;
-            margin: 16px auto;
-            padding: 0 16px;
-        }
+        .content-wrap { max-width: 680px; margin: 16px auto; padding: 0 16px; }
 
         .section-title {
             font-size: 0.8rem;
@@ -149,17 +130,16 @@
             display: block;
         }
 
-        .exam-card:active {
-            transform: scale(0.98);
+        .exam-card:active { transform: scale(0.98); }
+
+        .exam-card.special-card {
+            border: 2px solid #10b981;
+            background: linear-gradient(145deg, #132724 0%, #1e293b 100%);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
         }
 
-        .exam-card.tapera-card {
-            border-left: 4px solid var(--primary-light);
-        }
-
-        .exam-card.estrela-card {
-            border-left: 4px solid var(--estrela-light);
-        }
+        .exam-card.tapera-card { border-left: 4px solid var(--primary-light); }
+        .exam-card.estrela-card { border-left: 4px solid var(--estrela-light); }
 
         .card-top {
             display: flex;
@@ -184,23 +164,9 @@
             white-space: nowrap;
         }
 
-        .badge-green {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border: 1px solid rgba(52, 211, 153, 0.3);
-        }
-
-        .badge-blue {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border: 1px solid rgba(96, 165, 250, 0.3);
-        }
-
-        .badge-amber {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.3);
-        }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.3); }
+        .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
 
         .exam-desc {
             font-size: 0.82rem;
@@ -219,28 +185,9 @@
             color: var(--text-muted);
         }
 
-        .action-link {
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .tapera-card .action-link { color: #34d399; }
+        .action-link { font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .tapera-card .action-link, .special-card .action-link { color: #34d399; }
         .estrela-card .action-link { color: #60a5fa; }
-
-        .info-box {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px dashed var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            margin-top: 24px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        .info-box strong { color: #f8fafc; }
     </style>
 </head>
 <body>
@@ -254,8 +201,8 @@
 </header>
 
 <div class="tabs-container">
-    <button class="tab-btn active" onclick="filterCity('all', this)">Todos (9)</button>
-    <button class="tab-btn" onclick="filterCity('tapera', this)">📍 Tapera (5)</button>
+    <button class="tab-btn active" onclick="filterCity('all', this)">Todos (10)</button>
+    <button class="tab-btn" onclick="filterCity('tapera', this)">📍 Tapera (6)</button>
     <button class="tab-btn" onclick="filterCity('estrela', this)">📍 Estrela (4)</button>
 </div>
 
@@ -268,10 +215,23 @@
             <span style="color: #34d399; font-size: 0.72rem;">R$ 4.281,19</span>
         </div>
 
+        <!-- NOVO GERADOR DINÂMICO POR DIFICULDADE -->
+        <a href="src/simulador_dinamico_tapera.html" class="exam-card special-card" data-city="tapera">
+            <div class="card-top">
+                <span class="exam-title">🔥 Gerador Dinâmico por Dificuldade (Fácil / Média / Difícil)</span>
+                <span class="card-badge badge-amber">Novo Recurso</span>
+            </div>
+            <p class="exam-desc">Selecione o nível de dificuldade na hora. Prova com 45 questões (A a D) adaptadas das provas reais da FUNDATEC e conteúdo de Tapera.</p>
+            <div class="card-meta">
+                <span>45 Questões • Níveis Customizáveis</span>
+                <span class="action-link">Abrir Gerador ➔</span>
+            </div>
+        </a>
+
         <a href="src/simulado_tapera_assistente_administrativo_04_retificado.html" class="exam-card tapera-card" data-city="tapera">
             <div class="card-top">
                 <span class="exam-title">Simulado Oficial 04 (Retificado & Adaptativo)</span>
-                <span class="card-badge badge-amber">⭐ Mais Recente</span>
+                <span class="card-badge badge-green">Sprint Final</span>
             </div>
             <p class="exam-desc">Foco intensivo: Pitágoras, Volume Espacial, Função Quadrática (Vértice), LIA (Dolo e Prescrição) e Estatuto do Idoso.</p>
             <div class="card-meta">
@@ -383,10 +343,6 @@
                 <span class="action-link">Abrir Prova ➔</span>
             </div>
         </a>
-    </div>
-
-    <div class="info-box">
-        💡 <strong>Fluxo de Estudo no Celular:</strong> Abra o simulado desejado, responda com o cronômetro ativo e, ao final, toque no botão <em>"Copiar Relatório"</em>. Depois basta colar de volta no chat para calibrarmos os pontos fracos!
     </div>
 
 </div>
