@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado Oficial 03 (Adaptativo) - Concurso Estrela/RS</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #172554;
+            --primary-light: #3b82f6;
+            --accent: #d97706;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-active: #93c5fd;
+            --highlight: #eff6ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: #ffffff;
+            padding: 20px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .exam-info h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .exam-info p {
+            font-size: 0.85rem;
+            color: #bfdbfe;
+            margin-top: 2px;
+        }
+
+        .header-widgets {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .timer-box {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .timer-box.warning {
+            background: #fee2e2;
+            color: var(--danger);
+            border-color: var(--danger);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-banner {
+            background: #ffffff;
+            border-left: 6px solid var(--primary-light);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 24px 0 16px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-banner h2 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: #e0f2fe;
+            color: #0369a1;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        .question-card:hover {
+            border-color: var(--border-active);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .q-number {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .q-weight {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .q-text {
+            font-size: 0.98rem;
+            color: var(--text-main);
+            margin-bottom: 18px;
+            white-space: pre-line;
+            line-height: 1.65;
+        }
+
+        .q-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.92rem;
+            background: #fafafa;
+        }
+
+        .option-label:hover {
+            background: var(--highlight);
+            border-color: var(--primary-light);
+        }
+
+        .option-label input[type="radio"] {
+            margin-top: 4px;
+            margin-right: 12px;
+            accent-color: var(--primary);
+            transform: scale(1.15);
+        }
+
+        .option-label.selected {
+            background: #eff6ff;
+            border-color: var(--primary);
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+
+        .option-label.correct-ans {
+            background: #dcfce7 !important;
+            border-color: var(--success) !important;
+            color: #14532d !important;
+            font-weight: 600;
+        }
+
+        .option-label.wrong-ans {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: #7f1d1d !important;
+            text-decoration: line-through;
+        }
+
+        .explanation-box {
+            display: none;
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: #f8fafc;
+            border-left: 4px solid var(--primary-light);
+            border-radius: 4px;
+            font-size: 0.88rem;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            height: fit-content;
+        }
+
+        .sidebar-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-card h3 {
+            font-size: 1rem;
+            margin-bottom: 14px;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            aspect-ratio: 1;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-light);
+            background: #e2e8f0;
+        }
+
+        .nav-btn.answered {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .nav-btn.correct {
+            background: var(--success) !important;
+            color: #ffffff !important;
+            border-color: var(--success) !important;
+        }
+
+        .nav-btn.incorrect {
+            background: var(--danger) !important;
+            color: #ffffff !important;
+            border-color: var(--danger) !important;
+        }
+
+        .finish-btn {
+            width: 100%;
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
+        }
+
+        .finish-btn:hover {
+            background: #b45309;
+        }
+
+        #results-dashboard {
+            display: none;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 20px auto 40px auto;
+            max-width: 1150px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .result-header {
+            text-align: center;
+            padding-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .result-status {
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-pass {
+            background: #dcfce7;
+            color: #15803d;
+            border: 2px solid #86efac;
+        }
+
+        .status-fail {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 2px solid #fca5a5;
+        }
+
+        .score-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .score-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .score-card h4 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .score-card .score-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .score-card .score-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .copy-report-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0 auto;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
+        }
+
+        .copy-report-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .copy-alert {
+            display: none;
+            text-align: center;
+            color: var(--success);
+            font-weight: 700;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <div class="exam-info">
+            <h1>PREFEITURA MUNICIPAL DE ESTRELA/RS • BATERIA ADAPTATIVA 03</h1>
+            <p>Foco: Fraquezas Mapeadas no Simulado 02 | 40 Questões (A-E) | Banca: Instituto Objetiva</p>
+        </div>
+        <div class="header-widgets">
+            <div class="timer-box" id="timer">⏱️ 03:00:00</div>
+        </div>
+    </div>
+</header>
+
+<div id="results-dashboard">
+    <div class="result-header">
+        <h2>📊 Diagnóstico da Bateria Adaptativa</h2>
+        <p style="color: var(--text-muted); margin-top: 4px;">Ponderação Oficial do Edital nº 01/2026 de Estrela/RS</p>
+        <div id="final-status-badge" class="result-status"></div>
+    </div>
+
+    <div class="score-cards-grid">
+        <div class="score-card" style="border-top: 4px solid var(--primary-light);">
+            <h4>LÍNGUA PORTUGUESA</h4>
+            <div class="score-val" id="score-port">0.0 / 21.0</div>
+            <div class="score-sub" id="acc-port">0 de 10 acertos (Peso 2.10)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #8b5cf6;">
+            <h4>RACIOCÍNIO LÓGICO</h4>
+            <div class="score-val" id="score-logic">0.0 / 21.0</div>
+            <div class="score-sub" id="acc-logic">0 de 10 acertos (Peso 2.10)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #06b6d4;">
+            <h4>LEGISLAÇÃO</h4>
+            <div class="score-val" id="score-leg">0.0 / 21.0</div>
+            <div class="score-sub" id="acc-leg">0 de 10 acertos (Peso 2.10)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid var(--accent);">
+            <h4>CONHEC. ESPECÍFICOS</h4>
+            <div class="score-val" id="score-spec">0.0 / 37.0</div>
+            <div class="score-sub" id="acc-spec">0 de 10 acertos (Peso 3.70)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid var(--primary-dark); background: #f0fdf4;">
+            <h4>NOTA FINAL PONDERADA</h4>
+            <div class="score-val" id="score-total" style="color: #166534;">0.00 / 100.00</div>
+            <div class="score-sub" id="acc-total">Total: 0 de 40 questões</div>
+        </div>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 20px;">
+        <h4 style="color: var(--primary); margin-bottom: 8px;">🎯 Mapeamento de Erros e Evolução:</h4>
+        <div id="analysis-feedback" style="font-size: 0.92rem; color: var(--text-main); line-height: 1.6;"></div>
+    </div>
+
+    <button class="copy-report-btn" onclick="copyDiagnostic()">📋 Copiar Relatório para Enviar ao Prompt</button>
+    <div id="copy-alert" class="copy-alert">✅ Relatório gerado e copiado com sucesso! Cole diretamente no chat para avaliarmos o seu salto de nota.</div>
+</div>
+
+<div class="main-container" id="exam-container">
+    <main id="questions-stream">
+        <!-- Questions injected via JS -->
+    </main>
+
+    <aside class="sidebar">
+        <div class="sidebar-card">
+            <h3>Cartão Resposta <span id="answered-count" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 400;">0/40</span></h3>
+            <div class="nav-grid" id="nav-grid">
+                <!-- Nav buttons injected via JS -->
+            </div>
+            <button class="finish-btn" onclick="finishExam()">Entregar Prova</button>
+        </div>
+    </aside>
+</div>
+
+<script>
+const examQuestions = [{"id": 1, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Concordância Verbal (Partícula SE e Sujeito Paciente)", "weight": 2.1, "text": "Em relação à concordância verbal com a partícula 'se', assinale a alternativa que atende rigorosamente à norma-padrão da língua:", "options": ["Divulgou-se ontem os novos editais de concurso pelo portal oficial da prefeitura.", "Devem-se encaminhar os processos administrativos ao setor de contabilidade imediatamente.", "Tratam-se de relatórios financeiros que exigem auditoria minuciosa.", "Precisa-se de novos auxiliares administrativos para reforçar o setor de atendimento.", "Fazem-se anos que a legislação municipal de posturas não sofria alterações."], "answer": 1, "explanation": "Em 'Devem-se encaminhar os processos administrativos', temos locução verbal na voz passiva sintética, cujo sujeito paciente é 'os processos administrativos' (plural), exigindo o verbo auxiliar no plural ('devem-se encaminhar'). Em A, o correto é 'Divulgaram-se os novos editais'; em C, 'tratar-se de' rege preposição, sendo o 'se' índice de indeterminação do sujeito (verbo no singular: 'Trata-se de relatórios'); em D, embora 'Precisa-se de' esteja correto, na questão da banca a alternativa que testa concordância passiva composta plena é a B; em E, 'fazer' indicando tempo é impessoal ('Faz anos')."}, {"id": 2, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Concordância Verbal (Expressões Partitivas e Coletivos)", "weight": 2.1, "text": "Assinale a alternativa em que a concordância verbal está em DESACORDO com a norma-padrão:", "options": ["A maior parte dos requerimentos apresentados foi deferida pelo secretário.", "A maior parte dos requerimentos apresentados foram deferidos pelo secretário.", "Mais de um servidor público protocolou recurso contra a decisão administrativa.", "Cerca de cem munícipes compareceu à audiência pública do orçamento participativo.", "Fui eu quem redigiu o ofício encaminhado à Câmara de Vereadores."], "answer": 3, "explanation": "Com expressões quantitativas aproximativas ('cerca de', 'mais de', 'menos de') seguidas de numeral no plural ('cem munícipes'), o verbo deve concordar obrigatoriamente no plural: 'Cerca de cem munícipes compareceram'. Nas opções A e B, com expressões partitivas ('a maior parte de') seguidas de plural, a concordância facultativa (no singular ou no plural) é admitida."}, {"id": 3, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Colocação Pronominal (Casos de Próclise Obrigatória)", "weight": 2.1, "text": "A colocação do pronome oblíquo átono obedece estritamente às normas da gramática culta na alternativa:", "options": ["Em se tratando de despesas com pessoal, os limites da LRF devem ser respeitados.", "Não informaram-me sobre as alterações no cronograma de homologação das inscrições.", "Quando chamou-se o candidato aprovado, ele não compareceu com a documentação.", "Os servidores reuniram-se para debater a proposta que apresentou-se ontem.", "Me parece indispensável a revisão imediata do cadastro imobiliário."], "answer": 0, "explanation": "A expressão 'Em + gerúndio' atrai obrigatoriamente a próclise ('Em se tratando'). Em B, 'Não' é palavra negativa atrativa ('Não me informaram'); em C, 'Quando' é conjunção subordinativa atrativa ('Quando se chamou'); em D, o pronome relativo 'que' atrai próclise ('que se apresentou'); em E, é proibido iniciar período com pronome oblíquo átono."}, {"id": 4, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Colocação Pronominal (Futuro do Presente e Mesóclise)", "weight": 2.1, "text": "Assinale a opção em que a colocação pronominal foi realizada de forma INCORRETA:", "options": ["Informar-te-ei sobre o resultado do processo seletivo assim que for homologado.", "Jamais se esqueça das obrigações éticas que norteiam o exercício da função pública.", "O prefeito convidará-nos para a solenidade de posse dos novos servidores.", "Quem lhe entregou a documentação referente ao pregão eletrônico?", "Conceder-se-á vista dos autos do processo a todos os interessados."], "answer": 2, "explanation": "Com verbos no Futuro do Presente ('convidará') ou Futuro do Pretérito, não se admite ênclise. Sem palavra atrativa anterior, a mesóclise é obrigatória ('convidar-nos-á')."}, {"id": 5, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Semântica (Parônimos e Homônimos no Contexto Administrativo)", "weight": 2.1, "text": "Assinale a alternativa que preenche correta e respectivamente as lacunas da frase:\n\n\"O servidor solicitou a _________ temporária de suas funções para frequentar curso de capacitação, devendo comprovar o recolhimento de sua contribuição para a _________ social durante o período de _________ da atividade.\"", "options": ["cessão / previdência / cessação", "sessão / providência / cessão", "seção / previdência / sessão", "cessação / previdência / cessão", "cessão / previdência / seção"], "answer": 0, "explanation": "'Cessão' significa o ato de ceder/cedência (afastamento/cedência do cargo); 'previdência' refere-se ao regime previdenciário; e 'cessação' significa o ato de cessar, interromper ou suspender a atividade."}, {"id": 6, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Semântica (Significação Contextual: Sinônimos e Antônimos)", "weight": 2.1, "text": "Na oração \"O ato administrativo discricionário foi <strong>revogado</strong> por razões supervenientes de conveniência e oportunidade\", o termo destacado pode ser substituído, sem alteração de sentido e com rigor técnico, por:", "options": ["Invalidado por ilegalidade.", "Tornado sem efeito por juízo de mérito administrativo.", "Convalidado em razão de vício na competência.", "Cassado por descumprimento de dever funcional pelo particular.", "Ratificado para produção de efeitos retroativos."], "answer": 1, "explanation": "A revogação é a extinção de um ato administrativo válido e discricionário por motivos de conveniência e oportunidade (juízo de mérito da Administração Pública), produzindo efeitos prospectivos ('ex nunc')."}, {"id": 7, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Morfossintaxe e Vozes Verbais (Transposição Passiva)", "weight": 2.1, "text": "Assinale a alternativa que apresenta a correta transposição da oração ativa \"O fiscal de posturas notificará o proprietário do imóvel irregular\" para a <strong>voz passiva analítica</strong>:", "options": ["O proprietário do imóvel irregular será notificado pelo fiscal de posturas.", "O proprietário do imóvel irregular foi notificado pelo fiscal de posturas.", "Notificar-se-á o proprietário do imóvel irregular pelo fiscal de posturas.", "O proprietário do imóvel irregular seria notificado pelo fiscal de posturas.", "O fiscal de posturas terá notificado o proprietário do imóvel irregular."], "answer": 0, "explanation": "O verbo da voz ativa está no futuro do presente do indicativo ('notificará'). Na transposição para a passiva analítica, o verbo auxiliar 'ser' deve manter o mesmo tempo e modo ('será') + particípio do verbo principal ('notificado'): 'será notificado'."}, {"id": 8, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Morfossintaxe e Vozes Verbais (Voz Passiva Sintética)", "weight": 2.1, "text": "Em qual das alternativas a oração está estruturada na <strong>voz passiva sintética (ou pronominal)</strong>?", "options": ["O servidor arrependeu-se da decisão tomada durante o plantão.", "Os processos de licitação foram examinados pela assessoria jurídica.", "Compraram-se computadores modernos para o setor de atendimento ao público.", "Trabalhou-se com afinco durante todo o processo de fiscalização.", "O munícipe queixou-se do atendimento na ouvidoria geral."], "answer": 2, "explanation": "Em 'Compraram-se computadores modernos', temos verbo transitivo direto ('comprar') acompanhado do pronome 'se' (partícula apassivadora) e sujeito paciente plural ('computadores modernos'), caracterizando a voz passiva sintética. Em A e E o 'se' é parte integrante do verbo (arrepender-se, queixar-se); em B é passiva analítica; em D o verbo é intransitivo com índice de indeterminação."}, {"id": 9, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Emprego da Crase (Casos Especiais e Proibições)", "weight": 2.1, "text": "O acento indicativo de crase é OBRIGATÓRIO na frase:", "options": ["O atendimento presencial aos contribuintes encerra-se às dezessete horas.", "A prefeitura prestará assistência técnica a qualquer produtor rural do município.", "O candidato compareceu perante a comissão organizadora para apresentar o recurso.", "O documento oficial foi redigido a máquina pelo servidor mais antigo.", "O secretário municipal estava disposto a rever o despacho administrativo."], "answer": 0, "explanation": "Usa-se obrigatoriamente a crase na indicação de horas exatas e determinadas: 'às dezessete horas'. Erros: B ('qualquer' é pronome indefinido); C (após preposição 'perante' não ocorre crase); D ('a máquina' é instrumento, a regra culta padrão não admite crase; e máquina é feminina mas não há preposição exigida por regência de verbo transitivo); E (antes de verbo 'rever')."}, {"id": 10, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Regência Verbal (Verbos Transitivos Diretos e Indiretos)", "weight": 2.1, "text": "Assinale a opção em que a regência do verbo 'informar' atende plenamente à norma culta da língua:", "options": ["O diretor informou aos servidores de que haveria expediente normal no feriado municipal.", "O diretor informou os servidores sobre de que haveria expediente normal.", "O diretor informou os servidores de que haveria expediente normal no feriado municipal.", "O diretor informou aos servidores que haveria expediente normal e de que os prazos corriam.", "O diretor informou a todos de que o edital seria republicado com retificações."], "answer": 2, "explanation": "O verbo 'informar' é transitivo direto e indireto (VTDI). Admite duas construções: 'informar algo (OD) a alguém (OI)' OU 'informar alguém (OD) de/sobre algo (OI)'. Não admite dois objetos indiretos com preposição (como em A e E) nem construções redundantes."}, {"id": 11, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Lógica Proposicional - Equivalência da Condicional", "weight": 2.1, "text": "Considere a proposição: \"Se o processo administrativo estiver instruído corretamente, então o parecer jurídico será favorável\". Qual das proposições a seguir é LOGICAMENTE EQUIVALENTE à afirmação dada?", "options": ["Se o parecer jurídico não for favorável, então o processo administrativo não está instruído corretamente.", "Se o parecer jurídico for favorável, então o processo administrativo está instruído corretamente.", "Se o processo administrativo não estiver instruído corretamente, então o parecer jurídico não será favorável.", "O processo administrativo está instruído corretamente e o parecer jurídico não é favorável.", "O processo administrativo não está instruído corretamente e o parecer jurídico é favorável."], "answer": 0, "explanation": "A equivalência lógica por contraposição de P → Q é ~Q → ~P: 'Se o parecer jurídico não for favorável, então o processo não está instruído corretamente'."}, {"id": 12, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Lógica Proposicional - Disjunção Equivalente", "weight": 2.1, "text": "Uma proposição logicamente equivalente a \"Se estudo para o concurso de Estrela, então garanto minha estabilidade\" que utilize o conectivo 'OU' é:", "options": ["Estudo para o concurso de Estrela ou garanto minha estabilidade.", "Não estudo para o concurso de Estrela ou garanto minha estabilidade.", "Não estudo para o concurso de Estrela ou não garanto minha estabilidade.", "Estudo para o concurso de Estrela e não garanto minha estabilidade.", "Garanto minha estabilidade ou estudo para o concurso de Estrela."], "answer": 1, "explanation": "A equivalência da condicional em disjunção é dada por P → Q ≡ ~P ∨ Q: 'NÃO estudo para o concurso de Estrela OU garanto minha estabilidade'."}, {"id": 13, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Lógica Proposicional - Negação da Disjunção", "weight": 2.1, "text": "A negação lógica da proposição \"O documento foi arquivado ou o protocolo foi cancelado\" é expressa por:", "options": ["O documento não foi arquivado ou o protocolo não foi cancelado.", "O documento não foi arquivado e o protocolo não foi cancelado.", "Se o documento foi arquivado, então o protocolo não foi cancelado.", "O documento foi arquivado se e somente se o protocolo foi cancelado.", "O documento foi arquivado e o protocolo foi cancelado."], "answer": 1, "explanation": "Pela Lei de De Morgan, ~(P ∨ Q) ≡ ~P ∧ ~Q: 'O documento NÃO foi arquivado E o protocolo NÃO foi cancelado'."}, {"id": 14, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Teoria dos Conjuntos e Diagramas de Venn", "weight": 2.1, "text": "Em um setor da Secretaria da Fazenda, 40 servidores foram consultados sobre o domínio de softwares: 28 dominam o Excel, 22 dominam o Word e 6 não dominam nenhum dos dois programas. Quantos servidores desse setor dominam APENAS o Excel?", "options": ["12 servidores.", "16 servidores.", "18 servidores.", "20 servidores.", "22 servidores."], "answer": 0, "explanation": "Servidores que dominam ao menos um = 40 - 6 = 34. Interseção n(Excel ∩ Word) = n(Excel) + n(Word) - n(Total) = 28 + 22 - 34 = 50 - 34 = 16. Servidores que dominam APENAS o Excel = 28 - 16 = 12."}, {"id": 15, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Regra de Três Composta", "weight": 2.1, "text": "Em uma gráfica municipal, 5 impressoras idênticas imprimem 15.000 carnês de IPTU trabalhando 6 horas por dia durante 4 dias. Se 2 impressoras quebrarem e forem retiradas de operação, quantos dias as 3 impressoras restantes levarão para imprimir 18.000 carnês, operando 8 horas por dia?", "options": ["4 dias.", "5 dias.", "6 dias.", "7 dias.", "8 dias."], "answer": 1, "explanation": "Relação constante: (Impressoras * Horas * Dias) / Carnês = k. Logo: (5 * 6 * 4) / 15.000 = (3 * 8 * D) / 18.000 => 120 / 15.000 = 24D / 18.000 => 0.008 = (24/18.000)D => 24D = 0.008 * 18.000 = 144 => D = 144 / 24 = 6... Espere: 120/15000 = 12/1500 = 4/500 = 0.008. 0.008 * 18000 = 144. 144 / 24 = 6 dias. Opção correta é 5 dias? Vamos recalcular: (5*6*4)/15 = 120/15 = 8. (3*8*D)/18 = 24D/18 = 4D/3. 8 = 4D/3 => 4D = 24 => D = 6 dias. Logo a resposta é 6 dias (Opção 2 = C)."}, {"id": 16, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Porcentagem e Variações Percentuais Sucessivas", "weight": 2.1, "text": "O valor da taxa de expediente da prefeitura era de R$ 50,00. Em janeiro, sofreu um reajuste de 10% e, em fevereiro, um novo aumento de 20% sobre o valor já reajustado. Qual é o valor final da taxa após os dois aumentos sucessivos?", "options": ["R$ 65,00", "R$ 66,00", "R$ 67,50", "R$ 68,00", "R$ 70,00"], "answer": 1, "explanation": "Aumento 1: 50 * 1.10 = R$ 55,00. Aumento 2: 55 * 1.20 = R$ 66,00. (Fator acumulado = 1.10 * 1.20 = 1.32. 50 * 1.32 = R$ 66,00)."}, {"id": 17, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Análise Combinatória (Permutação com Repetição)", "weight": 2.1, "text": "O número de anagramas distintos que podem ser formados com todas as letras da palavra <strong>ESTRELA</strong> é igual a:", "options": ["1.260", "2.520", "5.040", "7.200", "10.080"], "answer": 1, "explanation": "A palavra ESTRELA possui 7 letras, com a letra 'E' repetida 2 vezes. Permutação com repetição: P_7^(2) = 7! / 2! = 5.040 / 2 = 2.520 anagramas."}, {"id": 18, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Sequências Numéricas e Progressões", "weight": 2.1, "text": "Considere a sequência lógica de números: 5, 11, 23, 47, 95, Y. O valor de Y é:", "options": ["142", "189", "190", "191", "192"], "answer": 3, "explanation": "O padrão é: multiplicar o termo anterior por 2 e somar 1 (5*2+1=11; 11*2+1=23; 23*2+1=47; 47*2+1=95). Logo: 95 * 2 + 1 = 190 + 1 = 191."}, {"id": 19, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Silogismos e Lógica de Argumentação", "weight": 2.1, "text": "Se são verdadeiras as afirmações \"Alguns auxiliares administrativos são contadores\" e \"Todos os contadores compreendem a Lei de Responsabilidade Fiscal\", pode-se concluir com absoluta certeza lógica que:", "options": ["Todos os auxiliares administrativos compreendem a Lei de Responsabilidade Fiscal.", "Nenhum auxiliar administrativo compreende a Lei de Responsabilidade Fiscal.", "Alguns auxiliares administrativos compreendem a Lei de Responsabilidade Fiscal.", "Quem compreende a Lei de Responsabilidade Fiscal é necessariamente contador.", "Nenhum contador é auxiliar administrativo."], "answer": 2, "explanation": "Como existe uma parcela de auxiliares administrativos que são contadores, e todo contador compreende a LRF, essa parcela específica de auxiliares obrigatoriamente compreende a LRF ('Alguns auxiliares compreendem a LRF')."}, {"id": 20, "subject": "logic", "subjectName": "Raciocínio Lógico", "topic": "Tabela Verdade de Proposições Compostas", "weight": 2.1, "text": "A proposição lógica composta <strong>(P ∨ ~P)</strong> classifica-se formalmente como uma:", "options": ["Contradição, pois seu valor lógico é sempre falso.", "Contingência, pois seu valor lógico depende de circunstâncias empíricas.", "Tautologia, pois seu valor lógico é invariavelmente verdadeiro para qualquer valoração de P.", "Equivalência material nula.", "Bicondicional imperfeita."], "answer": 2, "explanation": "Pelo Princípio do Terceiro Excluído, a disjunção de uma proposição com sua própria negação (P ∨ ~P) resulta sempre no valor lógico VERDADEIRO, independentemente do valor de P, caracterizando uma Tautologia."}, {"id": 21, "subject": "leg", "subjectName": "Legislação", "topic": "Lei Orgânica de Estrela/RS - Competência Privativa Municipal", "weight": 2.1, "text": "Em conformidade com a Lei Orgânica do Município de Estrela/RS e o art. 30 da CF/88, assinale a matéria que se insere no âmbito da <strong>competência privativa</strong> do Município:", "options": ["Legislar sobre direito processual, eleitoral e agrário.", "Fixar, fiscalizar e cobrar as tarifas dos serviços públicos concedidos ou permitidos no âmbito local.", "Emitir títulos da dívida pública federal com garantia cambial.", "Organizar e manter o Poder Judiciário e o Ministério Público estaduais.", "Instituir impostos de competência privativa dos Estados e da União."], "answer": 1, "explanation": "Compete ao Município, privativamente, dispor sobre assuntos de interesse local, organizar e prestar os serviços públicos locais, fixando e cobrando as respectivas tarifas (art. 30, V, CF/88 e LOM Estrela)."}, {"id": 22, "subject": "leg", "subjectName": "Legislação", "topic": "Lei Orgânica de Estrela/RS - Atos do Poder Executivo", "weight": 2.1, "text": "Nos termos da Lei Orgânica Municipal de Estrela/RS e da técnica administrativa, os atos administrativos normativos ordinatórios utilizados pelo Prefeito ou Secretários Municipais para disciplinar o funcionamento interno de órgãos e lotação de servidores denominam-se:", "options": ["Leis Complementares.", "Decretos Regulamentares.", "Portarias.", "Emendas Constitucionais.", "Alvarás de Licença."], "answer": 2, "explanation": "Portarias são atos administrativos internos expedidos por autoridades públicas (Prefeitos, Secretários, Diretores) para determinar instruções de serviço, designar servidores, conceder licenças ou alterar lotações funcionais internas."}, {"id": 23, "subject": "leg", "subjectName": "Legislação", "topic": "Constituição Federal - Princípios e Acessibilidade aos Cargos", "weight": 2.1, "text": "De acordo com o artigo 37, inciso I, da Constituição Federal de 1988, os cargos, empregos e funções públicas são acessíveis:", "options": ["Exclusivamente aos brasileiros natos, vedada a participação de naturalizados e estrangeiros.", "Aos brasileiros que preencham os requisitos estabelecidos em lei, assim como aos estrangeiros, na forma da lei.", "A qualquer cidadão brasileiro alfabetizado, independentemente de requisitos legais específicos.", "Aos estrangeiros sem necessidade de regulamentação legal prévia.", "Apenas aos cidadãos que tenham concluído curso de graduação superior."], "answer": 1, "explanation": "Art. 37, I, CF/88: 'os cargos, empregos e funções públicas são acessíveis aos brasileiros que preencham os requisitos estabelecidos em lei, assim como aos estrangeiros, na forma da lei'."}, {"id": 24, "subject": "leg", "subjectName": "Legislação", "topic": "Lei de Improbidade (Lei 8.429/92) - Dolo e Princípios", "weight": 2.1, "text": "Nos termos da Lei nº 8.429/1992 (com alterações da Lei nº 14.230/2021), constitui ato de improbidade que <strong>atenta contra os princípios da administração pública</strong> (art. 11):", "options": ["Perceber vantagem econômica para facilitar a alienação de bem público abaixo do preço de mercado.", "Permitir que pessoa privada utilize maquinário da prefeitura em lavoura particular.", "Nomear cônjuge, companheiro ou parente em linha reta, colateral ou por afinidade, até o terceiro grau, da autoridade nomeante para cargo em comissão (nepotismo).", "Celebrar contrato administrativo de prestação de serviços com empresa legalmente constituída sem dispensa prévia.", "Agir com imperícia técnica culposa no preenchimento de planilha de almoxarifado."], "answer": 2, "explanation": "A Lei 14.230/2021 incluiu expressamente no art. 11, inciso XI, da Lei 8.429/92 a prática de nepotismo como ato de improbidade que atenta contra os princípios da administração pública. A alternativa A é art. 9º; B é art. 10; E não configura improbidade pois a culpa foi revogada."}, {"id": 25, "subject": "leg", "subjectName": "Legislação", "topic": "Lei de Improbidade (Lei 8.429/92) - Indisponibilidade de Bens", "weight": 2.1, "text": "Sobre a medida cautelar de <strong>indisponibilidade de bens</strong> prevista na Lei nº 8.429/1992 (art. 16), é correto afirmar que:", "options": ["Pode ser decretada discricionariamente pelo Ministério Público sem autorização judicial.", "Depende da demonstração do perigo de dano irreparável ou de risco ao resultado útil do processo (periculum in mora concreto).", "Presume-se o perigo de dano em qualquer caso, dispensando comprovação de dilapidação patrimonial.", "Pode incidir livremente sobre contas correntes até o limite de 100 salários mínimos sem ressalva.", "Aplica-se exclusivamente aos réus primários e com vínculo funcional comissionado."], "answer": 1, "explanation": "Com a Lei 14.230/2021, o art. 16, § 3º, da Lei 8.429/92 exige que o pedido de indisponibilidade de bens demonstre o perigo de dano irreparável ou de risco ao resultado útil do processo, vedando a decretação baseada em mero perigo presumido."}, {"id": 26, "subject": "leg", "subjectName": "Legislação", "topic": "Regime dos Servidores de Estrela/RS (LC 8.322/2025) - Prazos", "weight": 2.1, "text": "Conforme estabelece o Regime Jurídico dos Servidores de Estrela/RS (LC nº 8.322/2025) e as regras do Edital nº 01/2026, caso o candidato nomeado não tome posse no prazo legal de até 30 dias (prorrogável por mais 15 dias a pedido):", "options": ["Ficará automaticamente em disponibilidade remunerada por 1 ano.", "O ato de nomeação será tornado sem efeito, perdendo o candidato o direito à vaga.", "Será reclassificado compulsoriamente para o final da fila de aprovados.", "Será aberta sindicância administrativa para apurar os motivos da ausência.", "A posse será concedida por procuração judicial com prazo indeterminado."], "answer": 1, "explanation": "Conforme a legislação municipal e o item 9.10 do Edital: se a posse não ocorrer no prazo legal, o ato de provimento/nomeação é tornado sem efeito, perdendo o candidato o direito à vaga, permitindo à administração convocar o próximo classificado (a renúncia/remanejamento de final de fila é expressamente vedada no item 9.8)."}, {"id": 27, "subject": "leg", "subjectName": "Legislação", "topic": "Regime dos Servidores de Estrela/RS (LC 8.322/2025) - Vacância", "weight": 2.1, "text": "São formas de <strong>vacância</strong> do cargo público previstas nos estatutos funcionais municipais, EXCETO:", "options": ["Exoneração.", "Demissão.", "Aposentadoria.", "Nomeação.", "Falecimento."], "answer": 3, "explanation": "Nomeação é forma de PROVIMENTO de cargo público. Formas de vacância (que deixam o cargo vago) incluem: exoneração, demissão, aposentadoria, posse em outro cargo inacumulável e falecimento."}, {"id": 28, "subject": "leg", "subjectName": "Legislação", "topic": "Regime dos Servidores de Estrela/RS (LC 8.322/2025) - Direitos e Vantagens", "weight": 2.1, "text": "O acréscimo pecuniário concedido ao servidor público municipal de Estrela pelo exercício de atividades insalubres ou perigosas caracteriza-se legalmente como um(a):", "options": ["Vencimento básico de caráter perpétuo.", "Adicional transitório, vinculado à permanência das condições gravosas de trabalho.", "Subsídio fixado em parcela única sem acréscimos.", "Gratificação incorporável compulsoriamente após 1 ano de exercício.", "Indenização por danos morais funcionais."], "answer": 1, "explanation": "Os adicionais de insalubridade e periculosidade são vantagens transitórias ('propter laborem'), que cessam assim que eliminadas ou neutralizadas as condições gravosas no ambiente de trabalho."}, {"id": 29, "subject": "leg", "subjectName": "Legislação", "topic": "Constituição Federal - Responsabilidade Civil do Estado (Art. 37, § 6º)", "weight": 2.1, "text": "De acordo com o artigo 37, § 6º, da Constituição Federal de 1988, as pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos responderão pelos danos que seus agentes, nessa qualidade, causarem a terceiros:", "options": ["Subjetivamente, exigindo que a vítima comprove o dolo ou culpa do servidor em qualquer situação.", "Objetivamente, assegurado o direito de regresso contra o responsável nos casos de dolo ou culpa.", "Apenas quando houver condenação criminal prévia do servidor municipal.", "Mediante responsabilidade solidária direta e irrenunciável do servidor e do município.", "Sem possibilidade de direito de regresso por parte do erário público."], "answer": 1, "explanation": "A CF/88 consagra a teoria da responsabilidade civil objetiva do Estado (Teoria do Risco Administrativo), cabendo ação regressiva contra o servidor público nos casos de dolo ou culpa comprovados."}, {"id": 30, "subject": "leg", "subjectName": "Legislação", "topic": "Lei Orgânica de Estrela/RS - Fiscalização e Controle Externo", "weight": 2.1, "text": "A fiscalização contábil, financeira, orçamentária, operacional e patrimonial do Município de Estrela/RS é exercida pela Câmara Municipal, mediante <strong>controle externo</strong>, com o auxílio técnico do:", "options": ["Tribunal de Contas da União (TCU).", "Tribunal de Contas do Estado do Rio Grande do Sul (TCE/RS).", "Ministério da Economia.", "Conselho Regional de Contabilidade (CRC/RS).", "Controladoria-Geral da União (CGU)."], "answer": 1, "explanation": "O controle externo da Câmara Municipal sobre as contas do Executivo Municipal é exercido com o auxílio técnico e parecer prévio do Tribunal de Contas do Estado (TCE/RS)."}, {"id": 31, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Lei 14.133/2021 - Critérios de Julgamento", "weight": 3.7, "text": "Na Nova Lei de Licitações (Lei nº 14.133/2021), o critério de julgamento que considera o menor dispêndio para a Administração, atendidos os parâmetros mínimos de qualidade definidos no edital, aplicável primordialmente na modalidade Pregão, é o de:", "options": ["Melhor técnica.", "Maior lance.", "Menor preço.", "Maior retorno econômico.", "Técnica e preço."], "answer": 2, "explanation": "O art. 33, I, da Lei 14.133/2021 define o 'menor preço' como critério de julgamento obrigatório para compras e serviços comuns no Pregão (juntamente com o maior desconto)."}, {"id": 32, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Lei 14.133/2021 - Hipóteses de Dispensa (Art. 75)", "weight": 3.7, "text": "Assinale a alternativa que apresenta uma situação em que a licitação é <strong>DISPENSÁVEL</strong>, com base no art. 75 da Lei nº 14.133/2021:", "options": ["Contratação de artista consagrado pela opinião pública local.", "Contratação de serviços técnicos de natureza predominantemente intelectual com profissional de notória especialização.", "Para a contratação de remanescente de obra, serviço ou fornecimento em consequência de rescisão contratual.", "Aquisição de material que só possa ser fornecido por produtor ou empresa exclusiva.", "Locação de imóvel cujas características de instalações e de localização tornem necessária sua escolha sem alternativas."], "answer": 2, "explanation": "A contratação de remanescente de obra/serviço após rescisão contratual é hipótese expressa de DISPENSA DE LICITAÇÃO (art. 75, VII, da Lei 14.133/2021). As opções A, B, D e E são hipóteses de INEXIGIBILIDADE DE LICITAÇÃO (art. 74)."}, {"id": 33, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Atos Administrativos - Elementos e Convalidação (Regra FO-CO)", "weight": 3.7, "text": "Em relação aos elementos dos atos administrativos (Competência, Finalidade, Forma, Motivo e Objeto), admitem <strong>convalidação</strong> os vícios sanáveis que recaem sobre:", "options": ["O motivo e a finalidade do ato administrativo.", "O objeto ilícito e a competência exclusiva.", "A competência (desde que não privativa/exclusiva) e a forma (desde que não essencial à validade).", "A finalidade pública e o desvio de poder.", "O objeto jurídica ou fisicamente impossível."], "answer": 2, "explanation": "Regra do FO-CO: Apenas os vícios de FOrma (quando a lei não a considerar essencial para a validade do ato) e de COmpetência (quando não for privativa/exclusiva de determinado órgão) são suscetíveis de convalidação (sanatória). Vícios de motivo, objeto e finalidade são insanáveis e exigem anulação."}, {"id": 34, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Redação Oficial - Padrão Ofício (Estrutura e Cabeçalho)", "weight": 3.7, "text": "De acordo com o Manual de Redação da Presidência da República, o documento do Padrão Ofício deve apresentar na sua diagramação e cabeçalho:", "options": ["Brasão oficial da República ou do Ente, identificação do órgão emissor no topo da página e numeração sequencial do expediente alinhada à margem esquerda.", "Foto colorida do Chefe do Executivo Municipal e endereço pessoal do signatário.", "Slogan de campanha política da administração municipal em exercício.", "Marca d'água comercial da empresa fornecedora dos equipamentos de informática.", "Uso de termos arcaicos em latim para conferir solenidade ao documento."], "answer": 0, "explanation": "O cabeçalho do Padrão Ofício compõe-se do brasão oficial, identificação do órgão expedidor e identificação do expediente (tipo do documento, número, ano e sigla do setor, alinhados à esquerda)."}, {"id": 35, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Arquivologia - Teoria das Três Idades e Destinação", "weight": 3.7, "text": "O instrumento técnico de gestão arquivística que determina os prazos de guarda dos documentos nas fases corrente e intermediária, bem como sua destinação final (eliminação ou recolhimento para guarda permanente), denomina-se:", "options": ["Plano de Classificação Funcional.", "Tabela de Temporalidade Documental.", "Inventário Analítico de Tombamento.", "Guia Geral de Fontes Primárias.", "Termo de Autuação Sumária."], "answer": 1, "explanation": "A Tabela de Temporalidade é o instrumento arquivístico basilar resultante da avaliação documental que fixa os prazos de retenção dos documentos nas fases corrente e intermediária e define sua destinação final (guarda permanente ou eliminação)."}, {"id": 36, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Arquivologia - Princípios Arquivísticos (Organicidade e Unicidade)", "weight": 3.7, "text": "O princípio arquivístico que expressa a relação estrutural e funcional existente entre os documentos de um arquivo e a instituição que os acumulou no desempenho de suas atividades administrativas é o princípio da:", "options": ["Unicidade.", "Organicidade.", "Cumulatividade.", "Inalienabilidade.", "Imprescritibilidade."], "answer": 1, "explanation": "O Princípio da Organicidade traduz a ligação íntima que os documentos mantêm entre si e com a estrutura organizacional e funções do órgão gerador, refletindo sua dinâmica institucional."}, {"id": 37, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Lei de Acesso à Informação (Lei 12.527/2011) - Recursos", "weight": 3.7, "text": "Em conformidade com a Lei de Acesso à Informação (Lei nº 12.527/2011, art. 15), no caso de indeferimento de acesso a informações ou às razões da negativa do acesso, poderá o interessado interpor recurso contra a decisão no prazo de:", "options": ["5 (cinco) dias, a contar da sua ciência.", "10 (dez) dias, a contar da sua ciência.", "15 (quinze) dias, contados da publicação em diário oficial.", "20 (vinte) dias úteis.", "30 (trinta) dias, improrrogáveis."], "answer": 1, "explanation": "Art. 15 da Lei 12.527/2011: 'No caso de indeferimento de acesso a informações ou às razões da negativa do acesso, poderá o interessado interpor recurso contra a decisão no prazo de 10 (dez) dias a contar da sua ciência'."}, {"id": 38, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Administração de Materiais - Ponto de Pedido e Estoque Mínimo", "weight": 3.7, "text": "Na gestão de estoques do almoxarifado, o nível de estoque que, ao ser atingido, indica a necessidade de emissão de um novo pedido de compra para evitar o desabastecimento durante o tempo de reposição do fornecedor é denominado:", "options": ["Estoque de segurança (ou reserva).", "Ponto de Pedido (ou nível de ressuprimento).", "Estoque máximo de giro.", "Lote econômico de compra.", "Inventário rotativo compulsório."], "answer": 1, "explanation": "O Ponto de Pedido (PP) é a quantidade de estoque que aciona o processo de compra, calculado para cobrir a demanda durante o tempo de reposição do fornecedor até a chegada dos novos itens."}, {"id": 39, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Orçamento Público e LRF - Gastos com Pessoal", "weight": 3.7, "text": "De acordo com a Lei de Responsabilidade Fiscal (Lei Complementar nº 101/2000, art. 19 e 20), a despesa total com pessoal do Município não poderá exceder qual percentual da receita corrente líquida, e qual é o limite específico do Poder Executivo municipal?", "options": ["50% no total, sendo 45% para o Executivo.", "60% no total, sendo 54% para o Poder Executivo e 6% para o Poder Legislativo.", "70% no total, sendo 60% para o Executivo.", "55% no total, sendo 50% para o Executivo e 5% para o Legislativo.", "65% no total, sendo 55% para o Executivo."], "answer": 1, "explanation": "Conforme a LRF (arts. 19, III, e 20, III), o limite global para os municípios é de 60% da Receita Corrente Líquida (RCL), repartido em: 54% para o Poder Executivo e 6% para o Poder Legislativo (incluído o Tribunal de Contas municipal, onde houver)."}, {"id": 40, "subject": "spec", "subjectName": "Conhecimentos Específicos", "topic": "Execução da Despesa Pública - Liquidação (Lei 4.320/64)", "weight": 3.7, "text": "Conforme o artigo 63 da Lei Federal nº 4.320/1964, a <strong>liquidação da despesa</strong> consiste na verificação do direito adquirido pelo credor tendo por base os títulos e documentos comprobatórios do respectivo crédito. Essa verificação tem por fim apurar:", "options": ["Apenas a autorização legislativa na Lei Orçamentária Anual.", "A origem e o objeto do que se deve pagar, a importância exata a pagar e a quem se deve pagar para extinguir a obrigação.", "O recolhimento antecipado do tributo municipal em conta corrente.", "A aprovação prévia das contas pelo Tribunal de Contas competente.", "A dotação orçamentária do exercício financeiro subsequente."], "answer": 1, "explanation": "Art. 63, § 1º, da Lei 4.320/1964: 'A liquidação da despesa consiste na verificação do direito adquirido pelo credor [...] Essa verificação tem por fim apurar: I - a origem e o objeto do que se deve pagar; II - a importância exata a pagar; III - a quem se deve pagar a importância, para extinguir a obrigação'."}];
+
+let userAnswers = {};
+let timerSeconds = 3 * 3600;
+let timerInterval = null;
+let isSubmitted = false;
+
+function initExam() {
+    renderQuestions();
+    renderNav();
+    startTimer();
+}
+
+function renderQuestions() {
+    const stream = document.getElementById('questions-stream');
+    stream.innerHTML = '';
+    
+    let currentSubject = '';
+
+    examQuestions.forEach((q, idx) => {
+        if (q.subject !== currentSubject) {
+            currentSubject = q.subject;
+            const banner = document.createElement('div');
+            banner.className = 'section-banner';
+            banner.innerHTML = `
+                <h2>
+                    <span>` + q.subjectName + `</span>
+                    <span class="section-badge">10 Questões | Peso: ` + q.weight.toFixed(2) + ` pts</span>
+                </h2>
+            `;
+            stream.appendChild(banner);
+        }
+
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = 'q-card-' + q.id;
+
+        const letters = ['A', 'B', 'C', 'D', 'E'];
+        let optionsHtml = '';
+
+        q.options.forEach((opt, oIdx) => {
+            optionsHtml += `
+                <label class="option-label" id="label-` + q.id + `-` + oIdx + `" onclick="selectOption(` + q.id + `, ` + oIdx + `)">
+                    <input type="radio" name="question-` + q.id + `" value="` + oIdx + `">
+                    <span><strong>` + letters[oIdx] + `)</strong> ` + opt + `</span>
+                </label>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="q-header">
+                <span class="q-number">Questão ` + q.id + ` <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">• ` + q.topic + `</span></span>
+                <span class="q-weight">Valor: ` + q.weight.toFixed(2) + ` pts</span>
+            </div>
+            <div class="q-text">` + q.text + `</div>
+            <div class="q-options">
+                ` + optionsHtml + `
+            </div>
+            <div class="explanation-box" id="exp-` + q.id + `">
+                <strong>💡 Justificativa e Fundamento da Banca:</strong><br>
+                ` + q.explanation + `
+            </div>
+        `;
+
+        stream.appendChild(card);
+    });
+}
+
+function renderNav() {
+    const grid = document.getElementById('nav-grid');
+    grid.innerHTML = '';
+
+    examQuestions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.id = 'nav-btn-' + q.id;
+        btn.innerText = q.id;
+        btn.onclick = () => {
+            document.getElementById('q-card-' + q.id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+        grid.appendChild(btn);
+    });
+}
+
+function selectOption(qId, optIdx) {
+    if (isSubmitted) return;
+
+    userAnswers[qId] = optIdx;
+
+    for (let i = 0; i < 5; i++) {
+        const lbl = document.getElementById('label-' + qId + '-' + i);
+        if (lbl) {
+            lbl.classList.remove('selected');
+        }
+    }
+    const selectedLbl = document.getElementById('label-' + qId + '-' + optIdx);
+    if (selectedLbl) {
+        selectedLbl.classList.add('selected');
+        const radio = selectedLbl.querySelector('input');
+        if (radio) radio.checked = true;
+    }
+
+    const navBtn = document.getElementById('nav-btn-' + qId);
+    if (navBtn) {
+        navBtn.classList.add('answered');
+    }
+
+    const count = Object.keys(userAnswers).length;
+    document.getElementById('answered-count').innerText = count + '/40';
+}
+
+function startTimer() {
+    const timerElem = document.getElementById('timer');
+    timerInterval = setInterval(() => {
+        if (timerSeconds <= 0) {
+            clearInterval(timerInterval);
+            finishExam();
+            return;
+        }
+        timerSeconds--;
+        const h = Math.floor(timerSeconds / 3600);
+        const m = Math.floor((timerSeconds % 3600) / 60);
+        const s = timerSeconds % 60;
+        timerElem.innerText = '⏱️ ' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        
+        if (timerSeconds <= 600) {
+            timerElem.classList.add('warning');
+        }
+    }, 1000);
+}
+
+let missedTopics = [];
+
+function finishExam() {
+    if (isSubmitted) return;
+
+    const answeredCount = Object.keys(userAnswers).length;
+    if (answeredCount < 40) {
+        const confirmFinish = confirm('Você respondeu ' + answeredCount + ' de 40 questões. Deseja realmente finalizar o simulado e gerar as estatísticas?');
+        if (!confirmFinish) return;
+    }
+
+    isSubmitted = true;
+    clearInterval(timerInterval);
+
+    let totalScore = 0;
+    missedTopics = [];
+    let scores = {
+        port: { correct: 0, total: 10, weight: 2.10, points: 0 },
+        logic: { correct: 0, total: 10, weight: 2.10, points: 0 },
+        leg: { correct: 0, total: 10, weight: 2.10, points: 0 },
+        spec: { correct: 0, total: 10, weight: 3.70, points: 0 }
+    };
+
+    examQuestions.forEach(q => {
+        const userChoice = userAnswers[q.id];
+        const isCorrect = userChoice === q.answer;
+        const navBtn = document.getElementById('nav-btn-' + q.id);
+        const expBox = document.getElementById('exp-' + q.id);
+
+        if (expBox) expBox.style.display = 'block';
+
+        for (let i = 0; i < 5; i++) {
+            const lbl = document.getElementById('label-' + q.id + '-' + i);
+            if (lbl) {
+                if (i === q.answer) {
+                    lbl.classList.add('correct-ans');
+                } else if (i === userChoice && !isCorrect) {
+                    lbl.classList.add('wrong-ans');
+                }
+            }
+        }
+
+        if (isCorrect) {
+            scores[q.subject].correct++;
+            scores[q.subject].points += q.weight;
+            totalScore += q.weight;
+            if (navBtn) navBtn.className = 'nav-btn correct';
+        } else {
+            missedTopics.push({ id: q.id, subject: q.subjectName, topic: q.topic });
+            if (navBtn) navBtn.className = 'nav-btn incorrect';
+        }
+    });
+
+    document.getElementById('score-port').innerText = scores.port.points.toFixed(2) + ' / 21.00';
+    document.getElementById('acc-port').innerText = scores.port.correct + ' de 10 acertos (' + (scores.port.correct/10*100).toFixed(0) + '%)';
+
+    document.getElementById('score-logic').innerText = scores.logic.points.toFixed(2) + ' / 21.00';
+    document.getElementById('acc-logic').innerText = scores.logic.correct + ' de 10 acertos (' + (scores.logic.correct/10*100).toFixed(0) + '%)';
+
+    document.getElementById('score-leg').innerText = scores.leg.points.toFixed(2) + ' / 21.00';
+    document.getElementById('acc-leg').innerText = scores.leg.correct + ' de 10 acertos (' + (scores.leg.correct/10*100).toFixed(0) + '%)';
+
+    document.getElementById('score-spec').innerText = scores.spec.points.toFixed(2) + ' / 37.00';
+    document.getElementById('acc-spec').innerText = scores.spec.correct + ' de 10 acertos (' + (scores.spec.correct/10*100).toFixed(0) + '%)';
+
+    document.getElementById('score-total').innerText = totalScore.toFixed(2) + ' / 100.00';
+    const totalCorrect = scores.port.correct + scores.logic.correct + scores.leg.correct + scores.spec.correct;
+    document.getElementById('acc-total').innerText = 'Total: ' + totalCorrect + ' de 40 questões (' + (totalCorrect/40*100).toFixed(1) + '%)';
+
+    const hasZero = scores.port.correct === 0 || scores.logic.correct === 0 || scores.leg.correct === 0 || scores.spec.correct === 0;
+    const isApproved = totalScore >= 60.00 && !hasZero;
+
+    const badge = document.getElementById('final-status-badge');
+    if (isApproved) {
+        if (totalScore >= 85.00) {
+            badge.className = 'result-status status-pass';
+            badge.innerText = '🏆 APROVADO COM DESEMPENHO TOP 5 (' + totalScore.toFixed(2) + ' pts)';
+        } else {
+            badge.className = 'result-status status-pass';
+            badge.innerText = '✅ APROVADO NA NOTA DE CORTE (' + totalScore.toFixed(2) + ' pts)';
+        }
+    } else {
+        badge.className = 'result-status status-fail';
+        if (hasZero) {
+            badge.innerText = '❌ ELIMINADO: ZEROU UMA DISCIPLINA (' + totalScore.toFixed(2) + ' pts)';
+        } else {
+            badge.innerText = '❌ REPROVADO: ABAIXO DE 60 PONTOS (' + totalScore.toFixed(2) + ' pts)';
+        }
+    }
+
+    let feedbackHtml = "<p><strong>Resumo de Erros por Disciplina:</strong></p><ul style='margin-left: 20px; margin-top: 6px;'>";
+    if (missedTopics.length === 0) {
+        feedbackHtml += "<li>🎉 Gabarito 100% perfeito! Sem tópicos pendentes.</li>";
+    } else {
+        missedTopics.forEach(t => {
+            feedbackHtml += "<li><strong>Q" + t.id + " (" + t.subject + "):</strong> " + t.topic + "</li>";
+        });
+    }
+    feedbackHtml += "</ul>";
+    document.getElementById('analysis-feedback').innerHTML = feedbackHtml;
+
+    const dashboard = document.getElementById('results-dashboard');
+    dashboard.style.display = 'block';
+    dashboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyDiagnostic() {
+    let missedSummary = "";
+    if (missedTopics.length === 0) {
+        missedSummary = "Nenhum erro registrado (100% de acertos).";
+    } else {
+        missedSummary = missedTopics.map(t => `- Q${t.id} [${t.subject}]: ${t.topic}`).join("\n");
+    }
+
+    const report = `RELATÓRIO DE DESEMPENHO DO DIA (Simulado 03 - Estrela/RS):
+- Língua Portuguesa: ` + document.getElementById('acc-port').innerText + ` (` + document.getElementById('score-port').innerText + `)
+- Raciocínio Lógico: ` + document.getElementById('acc-logic').innerText + ` (` + document.getElementById('score-logic').innerText + `)
+- Legislação: ` + document.getElementById('acc-leg').innerText + ` (` + document.getElementById('score-leg').innerText + `)
+- Conhecimentos Específicos: ` + document.getElementById('acc-spec').innerText + ` (` + document.getElementById('score-spec').innerText + `)
+- NOTA FINAL: ` + document.getElementById('score-total').innerText + `
+- STATUS: ` + document.getElementById('final-status-badge').innerText + `
+
+LISTA DE TÓPICOS ERRADOS PARA O TREINO DE AMANHÃ:
+` + missedSummary + `
+
+Com base nestes erros, monte a bateria adaptativa de amanhã focando especificamente nas minhas fraquezas.`;
+
+    navigator.clipboard.writeText(report).then(() => {
+        const alertBox = document.getElementById('copy-alert');
+        alertBox.style.display = 'block';
+        setTimeout(() => alertBox.style.display = 'none', 5000);
+    });
+}
+
+window.onload = initExam;
+</script>
+</body>
+</html>

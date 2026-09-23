@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado Oficial 01 - Concurso Tapera/RS - Assistente Administrativo</title>
+    <style>
+        :root {
+            --primary: #065f46;
+            --primary-dark: #064e3b;
+            --primary-light: #10b981;
+            --accent: #b45309;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-active: #a7f3d0;
+            --highlight: #ecfdf5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: #ffffff;
+            padding: 20px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .exam-info h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .exam-info p {
+            font-size: 0.85rem;
+            color: #a7f3d0;
+            margin-top: 2px;
+        }
+
+        .header-widgets {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .timer-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .timer-box.warning {
+            background: #fee2e2;
+            color: var(--danger);
+            border-color: var(--danger);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-banner {
+            background: #ffffff;
+            border-left: 6px solid var(--primary-light);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 24px 0 16px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-banner h2 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        .question-card:hover {
+            border-color: var(--primary-light);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .q-number {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .q-weight {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .q-text {
+            font-size: 0.98rem;
+            color: var(--text-main);
+            margin-bottom: 18px;
+            white-space: pre-line;
+            line-height: 1.65;
+        }
+
+        .q-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.92rem;
+            background: #fafafa;
+        }
+
+        .option-label:hover {
+            background: var(--highlight);
+            border-color: var(--primary-light);
+        }
+
+        .option-label input[type="radio"] {
+            margin-top: 4px;
+            margin-right: 12px;
+            accent-color: var(--primary);
+            transform: scale(1.15);
+        }
+
+        .option-label.selected {
+            background: #ecfdf5;
+            border-color: var(--primary);
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+
+        .option-label.correct-ans {
+            background: #dcfce7 !important;
+            border-color: var(--success) !important;
+            color: #14532d !important;
+            font-weight: 600;
+        }
+
+        .option-label.wrong-ans {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: #7f1d1d !important;
+            text-decoration: line-through;
+        }
+
+        .explanation-box {
+            display: none;
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: #f8fafc;
+            border-left: 4px solid var(--primary-light);
+            border-radius: 4px;
+            font-size: 0.88rem;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            height: fit-content;
+        }
+
+        .sidebar-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-card h3 {
+            font-size: 1rem;
+            margin-bottom: 14px;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            aspect-ratio: 1;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-light);
+            background: #e2e8f0;
+        }
+
+        .nav-btn.answered {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .nav-btn.correct {
+            background: var(--success) !important;
+            color: #ffffff !important;
+            border-color: var(--success) !important;
+        }
+
+        .nav-btn.incorrect {
+            background: var(--danger) !important;
+            color: #ffffff !important;
+            border-color: var(--danger) !important;
+        }
+
+        .finish-btn {
+            width: 100%;
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            box-shadow: 0 2px 4px rgba(180, 83, 9, 0.3);
+        }
+
+        .finish-btn:hover {
+            background: #92400e;
+        }
+
+        #results-dashboard {
+            display: none;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 20px auto 40px auto;
+            max-width: 1150px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .result-header {
+            text-align: center;
+            padding-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .result-status {
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-pass {
+            background: #dcfce7;
+            color: #15803d;
+            border: 2px solid #86efac;
+        }
+
+        .status-fail {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 2px solid #fca5a5;
+        }
+
+        .score-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .score-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .score-card h4 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .score-card .score-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .score-card .score-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .copy-report-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0 auto;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(6, 95, 70, 0.2);
+        }
+
+        .copy-report-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .copy-alert {
+            display: none;
+            text-align: center;
+            color: var(--success);
+            font-weight: 700;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <div class="exam-info">
+            <h1>PREFEITURA MUNICIPAL DE TAPERA/RS • CONCURSO PÚBLICO 01/2026</h1>
+            <p>Cargo: Assistente Administrativo | Banca: FUNDATEC | 45 Questões (A-D) | Pontuação Total: 100 pts</p>
+        </div>
+        <div class="header-widgets">
+            <div class="timer-box" id="timer">⏱️ 03:00:00</div>
+        </div>
+    </div>
+</header>
+
+<div id="results-dashboard">
+    <div class="result-header">
+        <h2>📊 Diagnóstico Oficial da Prova - Tapera/RS</h2>
+        <p style="color: var(--text-muted); margin-top: 4px;">Ponderação Oficial do Edital Fundatec nº 01/2026 (Assistente Administrativo)</p>
+        <div id="final-status-badge" class="result-status"></div>
+    </div>
+
+    <div class="score-cards-grid">
+        <div class="score-card" style="border-top: 4px solid var(--primary-light);">
+            <h4>LÍNGUA PORTUGUESA</h4>
+            <div class="score-val" id="score-port">0.0 / 30.0</div>
+            <div class="score-sub" id="acc-port">0 de 15 acertos (Peso 2.0)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #8b5cf6;">
+            <h4>MATEMÁTICA / RLM</h4>
+            <div class="score-val" id="score-logic">0.0 / 25.0</div>
+            <div class="score-sub" id="acc-logic">0 de 10 acertos (Peso 2.5)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #d97706;">
+            <h4>CONHEC. GERAIS</h4>
+            <div class="score-val" id="score-gerais">0.0 / 15.0</div>
+            <div class="score-sub" id="acc-gerais">0 de 5 acertos (Peso 3.0)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #06b6d4;">
+            <h4>LEGISLAÇÃO</h4>
+            <div class="score-val" id="score-leg">0.0 / 20.0</div>
+            <div class="score-sub" id="acc-leg">0 de 10 acertos (Peso 2.0)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid #ec4899;">
+            <h4>INFORMÁTICA</h4>
+            <div class="score-val" id="score-info">0.0 / 10.0</div>
+            <div class="score-sub" id="acc-info">0 de 5 acertos (Peso 2.0)</div>
+        </div>
+        <div class="score-card" style="border-top: 4px solid var(--primary-dark); background: #f0fdf4;">
+            <h4>NOTA FINAL TOTAL</h4>
+            <div class="score-val" id="score-total" style="color: #064e3b;">0.00 / 100.00</div>
+            <div class="score-sub" id="acc-total">Total: 0 de 45 questões</div>
+        </div>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 20px;">
+        <h4 style="color: var(--primary); margin-bottom: 8px;">🎯 Mapeamento de Erros e Diagnóstico:</h4>
+        <div id="analysis-feedback" style="font-size: 0.92rem; color: var(--text-main); line-height: 1.6;"></div>
+    </div>
+
+    <button class="copy-report-btn" onclick="copyDiagnostic()">📋 Copiar Relatório Oficial para Enviar ao Prompt</button>
+    <div id="copy-alert" class="copy-alert">✅ Relatório gerado e copiado com sucesso! Cole no chat para avaliarmos seu novo patamar.</div>
+</div>
+
+<div class="main-container" id="exam-container">
+    <main id="questions-stream">
+        <!-- Questions injected via JS -->
+    </main>
+
+    <aside class="sidebar">
+        <div class="sidebar-card">
+            <h3>Cartão Resposta <span id="answered-count" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 400;">0/45</span></h3>
+            <div class="nav-grid" id="nav-grid">
+                <!-- Nav buttons injected via JS -->
+            </div>
+            <button class="finish-btn" onclick="finishExam()">Entregar Prova</button>
+        </div>
+    </aside>
+</div>
+
+<script>
+const examQuestions = [{"id": 1, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Compreensão e Interpretação de Texto", "weight": 2.0, "text": "Leia o fragmento abaixo para responder à questão:\n\n\"A burocracia estatal frequentemente recebe conotações pejorativas no senso comum, associada à lentidão e ao excesso de formalismo. No entanto, em sua concepção teórica original, formulada por Max Weber, a organização burocrática visa à impessoalidade, à previsibilidade e à justiça procedimental. O verdadeiro desafio da administração pública contemporânea não é abolir as normas, mas torná-las instrumentos ágeis a serviço do bem comum, equilibrando conformidade jurídica e eficiência.\"\n\nDe acordo com o texto, a burocracia em sua acepção originária caracteriza-se por:", "options": ["Estimular a discricionariedade absoluta e a personalização das decisões públicas.", "Buscar a impessoalidade, a previsibilidade e a equidade nos procedimentos administrativos.", "Subordinar a legalidade estrita aos anseios imediatos da conveniência política.", "Promover a lentidão intencional dos processos para evitar fraudes tributárias."], "answer": 1, "explanation": "O texto explicita claramente que, na concepção original weberiana, a burocracia 'visa à impessoalidade, à previsibilidade e à justiça procedimental'."}, {"id": 2, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Coesão e Coerência Textual (Mecanismos de Retomada)", "weight": 2.0, "text": "No trecho \"O verdadeiro desafio da administração pública contemporânea não é abolir as normas, mas torná-<strong>las</strong> instrumentos ágeis...\", o pronome oblíquo em destaque refere-se anaforicamente a:", "options": ["Conotações pejorativas.", "Ações estatais.", "Normas.", "Decisões judiciais."], "answer": 2, "explanation": "O pronome 'las' retoma diretamente o substantivo feminino plural imediatamente anterior 'as normas' (tornar as normas instrumentos ágeis)."}, {"id": 3, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Tipologia e Gêneros Textuais", "weight": 2.0, "text": "O fragmento textual da Questão 1 classifica-se predominantemente como:", "options": ["Narrativo, pois relata uma sucessão cronológica de eventos com personagens públicos.", "Injuntivo, pois fornece instruções prescritivas e operacionais ao leitor.", "Dissertativo-argumentativo, pois expõe uma tese e desenvolve argumentos para fundamentá-la.", "Descritivo puro, pois enumera minuciosamente as características físicas de um órgão público."], "answer": 2, "explanation": "O texto analisa um conceito (burocracia), confronta o senso comum com a teoria e defende uma reflexão/posicionamento (dissertativo-argumentativo)."}, {"id": 4, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Ortografia e Acentuação Gráfica", "weight": 2.0, "text": "Assinale a alternativa em que todas as palavras estão acentuadas em obediência à MESMA regra gramatical de acentuação:", "options": ["Público, burocrática, contemporânea.", "Público, burocrática, ágeis.", "Impropriedade, previsibilidade, órgãos.", "Público, burocrática, jurídica."], "answer": 3, "explanation": "'Público', 'burocrática' e 'jurídica' são todas proparoxítonas e, portanto, acentuadas pela mesmíssima regra (todas as proparoxítonas são acentuadas)."}, {"id": 5, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Semântica (Significação de Palavras / Sinônimos)", "weight": 2.0, "text": "Na frase \"O servidor público agiu com <strong>presteza</strong> ao atender aos munícipes\", o vocábulo destacado pode ser substituído, sem alteração substancial de sentido, por:", "options": ["Morosidade.", "Celeridade e prontidão.", "Reserva excessiva.", "Indolência."], "answer": 1, "explanation": "'Presteza' significa agilidade, prontidão, rapidez e diligência no cumprimento de uma tarefa."}, {"id": 6, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Emprego do Sinal Indicativo de Crase", "weight": 2.0, "text": "Assinale a alternativa em que o uso do acento indicativo de crase é OBRIGATÓRIO:", "options": ["O requerimento foi encaminhado à Secretaria Municipal de Administração.", "O atendimento ao público ocorre de segunda a sexta-feira.", "O prefeito estava disposto a assinar o termo de colaboração.", "O processo foi remetido a uma repartição descentralizada."], "answer": 0, "explanation": "Quem encaminha, encaminha algo 'a' (preposição) + 'a Secretaria' (artigo feminino definido) = crase obrigatória ('à Secretaria'). Em B temos paralelismo sem artigo (de... a); em C antes de verbo não há crase; em D antes do artigo indefinido 'uma' não há crase."}, {"id": 7, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Concordância Verbal (Partícula SE)", "weight": 2.0, "text": "Assinale a alternativa em que a concordância verbal obedece estritamente às normas gramaticais vigentes:", "options": ["Autuou-se os processos administrativos no início da tarde.", "Devem-se protocolar todos os requerimentos de isenção até amanhã.", "Tratam-se de relatórios minuciosos sobre a arrecadação tributária.", "Apurou-se, nos últimos meses, inúmeras irregularidades patrimoniais."], "answer": 1, "explanation": "Em 'Devem-se protocolar todos os requerimentos', temos voz passiva sintética com locução verbal, em que 'todos os requerimentos' é sujeito paciente plural, exigindo o verbo auxiliar no plural ('devem-se protocolar'). Erros: A ('Autuaram-se os processos'); C ('Trata-se de' com preposição exige singular); D ('Apuraram-se [...] inúmeras irregularidades')."}, {"id": 8, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Concordância Verbal (Verbos Impessoais)", "weight": 2.0, "text": "Quanto aos verbos impessoais, assinale a opção inteiramente CORRETA:", "options": ["Haviam muitas dúvidas entre os candidatos a respeito do edital.", "Haverão novas oportunidades de concurso no próximo exercício financeiro.", "Fazem três anos que o prédio da prefeitura passou por reformas estruturais.", "Faz três anos que o concurso anterior teve sua validade homologada."], "answer": 3, "explanation": "O verbo 'fazer' indicando tempo decorrido é impessoal e deve permanecer obrigatoriamente na 3ª pessoa do singular ('Faz três anos'). O verbo 'haver' no sentido de existir também é impessoal ('Havia muitas dúvidas', 'Haverá novas oportunidades')."}, {"id": 9, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Regência Verbal", "weight": 2.0, "text": "Assinale a alternativa que apresenta a regência verbal em consonância com a norma-padrão:", "options": ["O novo assistente administrativo aspirava ao cargo de coordenação do setor.", "O fiscal municipal visou a placa do estabelecimento para autorizar o alvará.", "O servidor público prefere mais trabalhar no setor de compras do que no arquivo.", "O candidato não obedeceu o edital e foi desclassificado do certame."], "answer": 0, "explanation": "'Aspirar' no sentido de pretender/almejar é transitivo indireto e exige preposição 'a' (aspirava ao cargo). Erros: B ('visar' no sentido de mirar/rubricar é VTD: 'visou a placa', mas sem preposição se fosse feminino com artigo seria crase se exigisse; em C 'preferir' rejeita intensificadores e rege 'a'; em D 'obedecer' rege preposição 'a': 'obedeceu ao edital')."}, {"id": 10, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Colocação Pronominal", "weight": 2.0, "text": "Assinale a frase em que o pronome oblíquo átono foi posicionado de forma INCORRETA segundo a norma culta:", "options": ["Não me entregaram os documentos necessários para a formalização da posse.", "Em se tratando de despesas de capital, o planejamento orçamentário é obrigatório.", "Me disseram que o resultado preliminar das provas seria divulgado nesta data.", "O diretor informou que se ausentaria para participar de congresso técnico."], "answer": 2, "explanation": "A norma-padrão proíbe categoricamente iniciar períodos ou orações com pronome oblíquo átono ('Me disseram'). A forma correta é a ênclise: 'Disseram-me'."}, {"id": 11, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Pontuação (Uso da Vírgula)", "weight": 2.0, "text": "Assinale a alternativa em que a vírgula foi empregada de acordo com as regras gramaticais:", "options": ["O prefeito de Tapera, assinou os decretos de homologação pela manhã.", "Durante a assembleia extraordinária de servidores, discutiram-se as reivindicações da categoria.", "Os técnicos do município concluíram que, as obras necessitavam de aditivo contratual.", "A ata foi lida pelo secretário, e aprovada, por todos os presentes."], "answer": 1, "explanation": "A vírgula isola perfeitamente o adjunto adverbial de tempo e lugar antecipado e de extensão relevante ('Durante a assembleia extraordinária de servidores'). Nas demais há separação indevida de sujeito e predicado (A), de verbo e oração integrante (C) ou de termos essenciais (D)."}, {"id": 12, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Conjunções e Relações de Sentido", "weight": 2.0, "text": "Na oração: \"O projeto foi executado com rigor técnico, <strong>conquanto</strong> os prazos estivessem extremamente exíguos\", a conjunção destacada introduz uma oração subordinada com valor de:", "options": ["Causa.", "Consequência.", "Concessão.", "Condição."], "answer": 2, "explanation": "'Conquanto' é uma conjunção subordinativa concessiva (expressa concessão, oposição que não anula o fato principal; equivale a 'embora', 'ainda que')."}, {"id": 13, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Morfossintaxe e Vozes Verbais (Transposição Passiva)", "weight": 2.0, "text": "Assinale a alternativa que apresenta a correta transposição da oração ativa \"A equipe de engenharia avaliará as condições do prédio\" para a <strong>voz passiva analítica</strong>:", "options": ["As condições do prédio foram avaliadas pela equipe de engenharia.", "As condições do prédio serão avaliadas pela equipe de engenharia.", "Avaliar-se-ão as condições do prédio pela equipe de engenharia.", "As condições do prédio seriam avaliadas pela equipe de engenharia."], "answer": 1, "explanation": "O verbo ativo está no futuro do presente ('avaliará'). Na passiva analítica, o verbo auxiliar 'ser' vai para o futuro do presente no plural ('serão') acompanhado do particípio ('avaliadas'): 'serão avaliadas'."}, {"id": 14, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Estrutura e Formação de Palavras", "weight": 2.0, "text": "A palavra <strong>desalmado</strong> é formada pelo processo morfológico de:", "options": ["Derivação prefixal simples.", "Derivação sufixal simples.", "Derivação parassintética.", "Composição por aglutinação."], "answer": 2, "explanation": "A palavra é formada pelo acréscimo simultâneo do prefixo 'des-' e do sufixo '-ado' ao radical 'alm-' (alma). Como não existem as palavras intermediárias 'desalma' nem 'almado', trata-se de derivação parassintética."}, {"id": 15, "subject": "port", "subjectName": "Língua Portuguesa", "topic": "Figuras de Linguagem", "weight": 2.0, "text": "Em \"O servidor faltou com a verdade durante o depoimento à comissão de sindicância\", identifica-se a figura de linguagem denominada:", "options": ["Hipérbole.", "Eufemismo.", "Antítese.", "Pleonasmo."], "answer": 1, "explanation": "'Faltar com a verdade' é uma suavização intencional de uma expressão desagradável ou ofensiva ('mentir'), caracterizando um eufemismo."}, {"id": 16, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Lógica Proposicional - Negação da Condicional", "weight": 2.5, "text": "A negação lógica da proposição \"Se o candidato obtiver mais de 50 pontos, então será aprovado no concurso de Tapera\" é:", "options": ["Se o candidato não obtiver mais de 50 pontos, então não será aprovado.", "O candidato obtém mais de 50 pontos e não é aprovado no concurso de Tapera.", "O candidato não obtém mais de 50 pontos ou é aprovado no concurso de Tapera.", "Se o candidato for aprovado no concurso de Tapera, então obteve mais de 50 pontos."], "answer": 1, "explanation": "Negação de P → Q: regra do MANÉ (Mantém a primeira E Nega a segunda): P ∧ ~Q ('O candidato obtém mais de 50 pontos E NÃO é aprovado')."}, {"id": 17, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Lógica Proposicional - Equivalência Contrapositiva", "weight": 2.5, "text": "Uma proposição logicamente equivalente à condicional \"Se o munícipe reside em Tapera, então ele tem direito ao atendimento no posto local\" é:", "options": ["Se o munícipe tem direito ao atendimento no posto local, então ele reside em Tapera.", "Se o munícipe não tem direito ao atendimento no posto local, então ele não reside em Tapera.", "Se o munícipe não reside em Tapera, então ele não tem direito ao atendimento no posto local.", "O munícipe reside em Tapera e não tem direito ao atendimento no posto local."], "answer": 1, "explanation": "Equivalência contrapositiva: (P → Q) ≡ (~Q → ~P). 'Se o munícipe NÃO tem direito ao atendimento [...], então ele NÃO reside em Tapera'."}, {"id": 18, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Lógica Proposicional - Disjunção Equivalente", "weight": 2.5, "text": "Dada a proposição condicional \"Se chove no município, então a obra é suspensa\", a sua forma logicamente equivalente utilizando o conectivo 'OU' é:", "options": ["Chove no município ou a obra é suspensa.", "Não chove no município ou a obra é suspensa.", "Não chove no município ou a obra não é suspensa.", "Chove no município e a obra não é suspensa."], "answer": 1, "explanation": "Equivalência da condicional em disjunção: (P → Q) ≡ (~P ∨ Q). Nega-se a primeira OU mantém-se a segunda: 'NÃO chove no município OU a obra é suspensa'."}, {"id": 19, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Teoria dos Conjuntos", "weight": 2.5, "text": "Em um departamento com 60 servidores, 35 utilizam transporte coletivo, 25 utilizam veículo próprio e 8 servidores não utilizam nenhum desses dois meios para ir ao trabalho. Quantos servidores utilizam AMBOS os meios de transporte?", "options": ["6 servidores.", "8 servidores.", "10 servidores.", "12 servidores."], "answer": 1, "explanation": "Servidores que utilizam pelo menos um meio = 60 - 8 = 52. Pela fórmula da união de conjuntos: n(A ∪ B) = n(A) + n(B) - n(A ∩ B) => 52 = 35 + 25 - x => 52 = 60 - x => x = 8 servidores."}, {"id": 20, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Regra de Três Composta", "weight": 2.5, "text": "Se 4 digitadores, trabalhando 6 horas por dia com a mesma produtividade, cadastram 480 certidões em 5 dias, quantos dias serão necessários para que 6 digitadores, trabalhando 8 horas por dia, cadastrem 720 certidões?", "options": ["2,5 dias.", "3,75 dias.", "4 dias.", "5 dias."], "answer": 1, "explanation": "Constante de proporcionalidade: (Digitadores * Horas * Dias) / Certidões = k. Primeiro grupo: (4 * 6 * 5) / 480 = 120 / 480 = 0.25. Segundo grupo: (6 * 8 * D) / 720 = 0.25 => 48D / 720 = 0.25 => 48D = 180 => D = 180 / 48 = 3,75 dias."}, {"id": 21, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Porcentagem e Matemática Financeira", "weight": 2.5, "text": "Um servidor público aplicou um capital de R$ 5.000,00 a juros simples, a uma taxa de 2% ao mês, durante 6 meses. O valor total do montante resgatado ao final do período foi de:", "options": ["R$ 5.500,00", "R$ 5.600,00", "R$ 5.800,00", "R$ 6.000,00"], "answer": 1, "explanation": "Juros simples: J = C * i * t = 5.000 * 0.02 * 6 = 5.000 * 0.12 = R$ 600,00. Montante = C + J = 5.000 + 600 = R$ 5.600,00."}, {"id": 22, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Análise Combinatória (Combinação Simples)", "weight": 2.5, "text": "Para compor uma comissão de licitação formada por 3 membros titulares, o setor administrativo dispõe de 8 servidores habilitados. De quantas maneiras diferentes essa comissão pode ser constituída?", "options": ["24 maneiras.", "56 maneiras.", "112 maneiras.", "336 maneiras."], "answer": 1, "explanation": "A ordem de escolha dos membros não altera a comissão, logo trata-se de Combinação Simples: C(8, 3) = (8 * 7 * 6) / (3 * 2 * 1) = 336 / 6 = 56 maneiras."}, {"id": 23, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Probabilidade", "weight": 2.5, "text": "Em uma urna há 20 fichas numeradas de 1 a 20. Retirando-se ao acaso uma única ficha dessa urna, qual é a probabilidade de que o número sorteado seja um múltiplo de 3?", "options": ["20%", "25%", "30%", "35%"], "answer": 2, "explanation": "Múltiplos de 3 entre 1 e 20: {3, 6, 9, 12, 15, 18} = 6 números. Probabilidade = 6 / 20 = 3 / 10 = 30%."}, {"id": 24, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Geometria Plana (Cálculo de Áreas)", "weight": 2.5, "text": "Um terreno retangular de propriedade da Prefeitura de Tapera possui 25 metros de frente por 40 metros de extensão de fundos. A área total desse terreno é de:", "options": ["130 m²", "500 m²", "1.000 m²", "1.200 m²"], "answer": 2, "explanation": "A área de uma superfície retangular é calculada pelo produto da base pela altura: A = 25 m * 40 m = 1.000 m²."}, {"id": 25, "subject": "logic", "subjectName": "Matemática / RLM", "topic": "Sequências e Regularidades Lógicas", "weight": 2.5, "text": "Observe a sucessão numérica: 4, 9, 19, 39, 79, K. O valor do número K que preserva a lei de formação da sequência é:", "options": ["149", "158", "159", "160"], "answer": 2, "explanation": "Padrão de formação: dobra o termo anterior e soma 1 (4*2+1=9; 9*2+1=19; 19*2+1=39; 39*2+1=79). O próximo termo K é 79 * 2 + 1 = 158 + 1 = 159."}, {"id": 26, "subject": "gerais", "subjectName": "Conhecimentos Gerais", "topic": "Aspectos Regionais e Geográficos de Tapera e Região", "weight": 3.0, "text": "O Município de Tapera/RS localiza-se na região noroeste do Estado do Rio Grande do Sul, inserido na região geográfica e hidrográfica do:", "options": ["Vale dos Sinos.", "Alto Jacuí.", "Litoral Norte.", "Pampa / Fronteira Oeste."], "answer": 1, "explanation": "Tapera integra a região geográfica do Alto Jacuí no Rio Grande do Sul, caracterizada pela forte produção agropecuária e bacia do Rio Jacuí."}, {"id": 27, "subject": "gerais", "subjectName": "Conhecimentos Gerais", "topic": "Meio Ambiente e Desenvolvimento Sustentável", "weight": 3.0, "text": "O conceito de 'desenvolvimento sustentável', consolidado a partir do Relatório Brundtland (Nosso Futuro Comum, 1987), é definido como aquele que:", "options": ["Estimula a exploração imediata e irrestrita dos recursos minerais para gerar superávit fiscal.", "Atende às necessidades do presente sem comprometer a capacidade das gerações futuras de suprirem suas próprias necessidades.", "Proíbe qualquer atividade industrial ou agrícola em áreas municipais urbanas.", "Prioriza o crescimento econômico a curto prazo, adiando medidas de contenção de poluição."], "answer": 1, "explanation": "A definição clássica de desenvolvimento sustentável é aquela que atende às necessidades da geração presente sem comprometer a possibilidade de as gerações futuras atenderem às suas próprias necessidades."}, {"id": 28, "subject": "gerais", "subjectName": "Conhecimentos Gerais", "topic": "Direitos Humanos e Cidadania", "weight": 3.0, "text": "A respeito dos Direitos Humanos, assinale a afirmativa que expressa CORRETAMENTE uma de suas características fundamentais:", "options": ["São renunciáveis, podendo o cidadão alienar seu direito à vida mediante remuneração financeira.", "São universais, aplicando-se a todos os seres humanos indistintamente, sem qualquer discriminação.", "Possuem vigência temporária e prescrevem caso não sejam exercidos durante 10 anos.", "Aplicam-se exclusivamente aos cidadãos que estejam em pleno gozo de direitos políticos."], "answer": 1, "explanation": "A universalidade é um dos princípios basilares dos Direitos Humanos: todos os indivíduos são titulares desses direitos, independentemente de nacionalidade, raça, sexo, religião ou condição social."}, {"id": 29, "subject": "gerais", "subjectName": "Conhecimentos Gerais", "topic": "Igualdade Racial e Enfrentamento à Discriminação", "weight": 3.0, "text": "O conceito de 'racismo estrutural' na sociologia e no direito contemporâneo refere-se:", "options": ["Exclusivamente a ofensas verbais isoladas praticadas por indivíduos com intenção preconceituosa.", "À forma como as instituições e as relações sociais, políticas e econômicas são historicamente constituídas de modo a manter desigualdades e desvantagens sistemáticas para grupos raciais sub-representados.", "A leis municipais que concedem privilégios trabalhistas automáticos a determinados grupos étnicos.", "À ausência completa de leis protetivas em um ordenamento jurídico democrático."], "answer": 1, "explanation": "O racismo estrutural compreende as práticas, hábitos e dinâmicas políticas e econômicas históricas que institucionalizam e normalizam vantagens para um grupo e desvantagens para outro no seio da estrutura social."}, {"id": 30, "subject": "gerais", "subjectName": "Conhecimentos Gerais", "topic": "Inclusão Social e Combate ao Capacitismo", "weight": 3.0, "text": "A atitude preconceituosa que subestima, discrimina ou desqualifica a capacidade de pessoas com deficiência, julgando-as inferiores ou incapazes com base em padrões normativos corporais, denomina-se:", "options": ["Aporofobia.", "Etarismo.", "Capacitismo.", "Xenofobia."], "answer": 2, "explanation": "Capacitismo é o termo que designa o preconceito e a discriminação direcionados contra pessoas com deficiência, pressupondo que elas são menos capazes ou inferiores em relação a pessoas sem deficiência."}, {"id": 31, "subject": "leg", "subjectName": "Legislação", "topic": "Constituição Federal - Princípios da Administração (Art. 37)", "weight": 2.0, "text": "Conforme o artigo 37, caput, da Constituição Federal de 1988, a administração pública direta e indireta de qualquer dos Poderes da União, dos Estados, do DF e dos Municípios obedecerá aos princípios da:", "options": ["Legalidade, impessoalidade, moralidade, publicidade e eficiência.", "Legalidade, proporcionalidade, discricionariedade, publicidade e celeridade.", "Moralidade, pessoalidade, supremacia do interesse privado e economicidade.", "Legalidade, sigilo administrativo, motivação prévia e hierarquia absoluta."], "answer": 0, "explanation": "Art. 37, caput, CF/88: Princípios expressos do LIMPE (Legalidade, Impessoalidade, Moralidade, Publicidade e Eficiência)."}, {"id": 32, "subject": "leg", "subjectName": "Legislação", "topic": "Constituição Federal - Estabilidade do Servidor (Art. 41)", "weight": 2.0, "text": "Nos termos do artigo 41 da Constituição Federal de 1988, adquirem estabilidade após 3 (três) anos de efetivo exercício os servidores nomeados para cargo de provimento efetivo em virtude de concurso público. Como condição obrigatória para a aquisição da estabilidade, é indispensável:", "options": ["Aprovação em novo concurso público de provas e títulos.", "Avaliação especial de desempenho por comissão instituída para essa finalidade.", "Cumprimento de mandato eletivo em sindicato da categoria profissional.", "Conclusão de curso de pós-graduação lato sensu reconhecido pelo MEC."], "answer": 1, "explanation": "Art. 41, § 4º, da CF/88: 'Como condição para a aquisição da estabilidade, é obrigatória a avaliação especial de desempenho por comissão instituída para essa finalidade'."}, {"id": 33, "subject": "leg", "subjectName": "Legislação", "topic": "Constituição Federal - Acumulação de Cargos (Art. 37, XVI)", "weight": 2.0, "text": "A regra constitucional geral proíbe a acumulação remunerada de cargos públicos. No entanto, havendo compatibilidade de horários, a Constituição Federal permite excepcionalmente a acumulação de:", "options": ["Três cargos de professor em redes municipais distintas.", "Dois cargos de auxiliar administrativo em órgãos de cidades vizinhas.", "Um cargo de professor com outro técnico ou científico.", "Dois cargos comissionados de livre nomeação e exoneração."], "answer": 2, "explanation": "Art. 37, XVI, 'b', da CF/88: é permitida a acumulação remunerada de um cargo de professor com outro técnico ou científico, havendo compatibilidade de horários."}, {"id": 34, "subject": "leg", "subjectName": "Legislação", "topic": "Constituição Federal - Responsabilidade Civil do Estado (Art. 37, § 6º)", "weight": 2.0, "text": "De acordo com o artigo 37, § 6º, da Constituição Federal de 1988, a responsabilidade das pessoas jurídicas de direito público pelos danos causados por seus agentes a terceiros é:", "options": ["Subjetiva perante a vítima e objetiva perante o servidor em ação regressiva.", "Objetiva perante a vítima, assegurado o direito de regresso contra o servidor nos casos de dolo ou culpa.", "Subsidiária, exigindo o prévio esgotamento dos bens particulares do servidor.", "Exclusiva do servidor público causador direto do dano, ficando o Município isento."], "answer": 1, "explanation": "A responsabilidade civil do Estado perante a vítima é OBJETIVA (dispensa dolo ou culpa do agente). Contra o servidor, cabe ação regressiva SUBJETIVA (exigindo dolo ou culpa)."}, {"id": 35, "subject": "leg", "subjectName": "Legislação", "topic": "Lei de Improbidade (Lei 8.429/92) - Dolo Específico", "weight": 2.0, "text": "A Lei nº 14.230/2021 alterou profundamente a Lei de Improbidade Administrativa (Lei nº 8.429/1992). Atualmente, para que seja configurado ato de improbidade administrativa, exige-se:", "options": ["A demonstração inequívoca de dolo específico (vontade livre e consciente de alcançar o resultado ilícito).", "Mera conduta culposa decorrente de negligência, imprudência ou imperícia do servidor.", "Apenas a comprovação do dano patrimonial, dispensando elemento subjetivo.", "Divergência interpretativa de lei amparada em jurisprudência não pacificada."], "answer": 0, "explanation": "Com a Lei 14.230/21, foi extinta a modalidade culposa na improbidade administrativa. O art. 1º, § 2º, exige a presença obrigatória do DOLO ESPECÍFICO."}, {"id": 36, "subject": "leg", "subjectName": "Legislação", "topic": "Lei de Improbidade (Lei 8.429/92) - Sanções", "weight": 2.0, "text": "Conforme a Lei nº 8.429/1992 (art. 12, I), ao agente que pratica ato de improbidade que importa em <strong>enriquecimento ilícito</strong>, pode ser aplicada a sanção de suspensão dos direitos políticos por até:", "options": ["5 (cinco) anos.", "8 (oito) anos.", "12 (doze) anos.", "14 (quatorze) anos."], "answer": 3, "explanation": "No enriquecimento ilícito (art. 12, I), a suspensão dos direitos políticos pode alcançar até 14 (quatorze) anos. (Na lesão ao erário é até 12 anos)."}, {"id": 37, "subject": "leg", "subjectName": "Legislação", "topic": "Lei de Improbidade (Lei 8.429/92) - Prescrição Geral (Art. 23)", "weight": 2.0, "text": "Nos termos do artigo 23 da Lei nº 8.429/1992, a ação para a aplicação das sanções de improbidade administrativa prescreve em:", "options": ["5 (cinco) anos contados da data em que o fato foi descoberto.", "8 (oito) anos contados a partir da data da ocorrência do fato ou da cessação da permanência.", "10 (dez) anos a contar da homologação do parecer do Tribunal de Contas.", "Prazo indeterminado e imprescritível em qualquer hipótese."], "answer": 1, "explanation": "O art. 23 unificou o prazo prescricional da ação de improbidade em 8 (oito) anos, contados a partir da ocorrência do fato ou, no caso de infrações permanentes, do dia em que cessou a permanência."}, {"id": 38, "subject": "leg", "subjectName": "Legislação", "topic": "Regime dos Servidores Municipais - Reintegração", "weight": 2.0, "text": "A reinvestidura do servidor público estável no cargo anteriormente ocupado, com ressarcimento integral de todas as vantagens remuneratórias a que teria direito, quando invalidada a sua demissão por decisão administrativa ou judicial, denomina-se:", "options": ["Reversão.", "Reintegração.", "Recondução.", "Aproveitamento."], "answer": 1, "explanation": "Reintegração é o retorno do servidor estável demitido ilegalmente, com ressarcimento integral de seus vencimentos e vantagens retroativas."}, {"id": 39, "subject": "leg", "subjectName": "Legislação", "topic": "Regime dos Servidores Municipais - Reversão", "weight": 2.0, "text": "O retorno à atividade do servidor aposentado por invalidez quando junta médica oficial declara insubsistentes os motivos determinantes da incapacidade denomina-se:", "options": ["Readaptação.", "Reversão.", "Recondução.", "Disponibilidade."], "answer": 1, "explanation": "Reversão é o instituto funcional pelo qual o aposentado retorna ao serviço ativo (o 'velhinho que volta'), seja por insubsistência da invalidez ou no interesse da administração."}, {"id": 40, "subject": "leg", "subjectName": "Legislação", "topic": "Lei Orgânica Municipal - Competências do Município", "weight": 2.0, "text": "De acordo com as competências fundamentais da Lei Orgânica Municipal e do art. 30 da CF/88, compete privativamente ao Município:", "options": ["Legislar sobre assuntos de interesse local e organizar e prestar os serviços públicos locais.", "Legislar privativamente sobre direito processual penal e normas de comércio exterior.", "Declarar guerra internacional e estabelecer relações diplomáticas com Estados estrangeiros.", "Emitir moeda metálica e títulos da dívida mobiliária federal."], "answer": 0, "explanation": "A competência privativa municipal (art. 30, I e V da CF/88 e Leis Orgânicas) reside na edição de normas sobre assuntos de interesse local e na organização/prestação direta ou sob delegação dos serviços públicos locais."}, {"id": 41, "subject": "info", "subjectName": "Informática", "topic": "Sistema Operacional Windows 10/11 e Teclas de Atalho", "weight": 2.0, "text": "No ambiente do sistema operacional Microsoft Windows 10 e 11, a combinação de teclas de atalho utilizada para abrir diretamente o <strong>Explorador de Arquivos (File Explorer)</strong> é:", "options": ["Windows + E", "Windows + R", "Ctrl + Shift + Esc", "Alt + F4"], "answer": 0, "explanation": "A tecla de atalho Windows + E abre imediatamente o Explorador de Arquivos. Windows + R abre o Executar; Ctrl + Shift + Esc abre o Gerenciador de Tarefas; Alt + F4 fecha a janela ativa."}, {"id": 42, "subject": "info", "subjectName": "Informática", "topic": "Microsoft Word 365 - Formatação e Edição", "weight": 2.0, "text": "No Microsoft Word 365, para inserir uma <strong>Quebra de Página</strong> manual a partir da posição atual do cursor no documento, o usuário pode utilizar o atalho de teclado:", "options": ["Ctrl + Enter", "Shift + Enter", "Alt + Enter", "Ctrl + Espaço"], "answer": 0, "explanation": "O atalho Ctrl + Enter insere uma quebra de página imediata no Microsoft Word. Shift + Enter insere apenas uma quebra de linha (sem novo parágrafo)."}, {"id": 43, "subject": "info", "subjectName": "Informática", "topic": "Microsoft Excel 365 - Funções Lógicas e Fórmulas", "weight": 2.0, "text": "No Microsoft Excel 365, considere que a célula A1 contenha o valor 70 e a célula B1 contenha o valor 50. Ao inserir na célula C1 a fórmula <code>=SE(E(A1>=60; B1>=60); \"Aprovado\"; \"Revisar\")</code>, o resultado exibido na célula C1 será:", "options": ["Aprovado", "Revisar", "#VALOR!", "VERDADEIRO"], "answer": 1, "explanation": "A função E(A1>=60; B1>=60) exige que ambas as condições sejam verdadeiras. Como A1=70 (V), mas B1=50 (F, não é maior ou igual a 60), a conjunção resulta em FALSO. Logo, a função SE retorna o valor falso: 'Revisar'."}, {"id": 44, "subject": "info", "subjectName": "Informática", "topic": "Navegadores de Internet (Google Chrome)", "weight": 2.0, "text": "No navegador Google Chrome em sua configuração padrão, para abrir uma nova janela em modo de <strong>Navegação Anônima (Incognito Window)</strong>, o atalho padrão é:", "options": ["Ctrl + T", "Ctrl + N", "Ctrl + Shift + N", "Ctrl + H"], "answer": 2, "explanation": "Ctrl + Shift + N abre uma nova janela anônima no Google Chrome. Ctrl + T abre uma nova guia; Ctrl + N abre uma nova janela normal; Ctrl + H abre o histórico."}, {"id": 45, "subject": "info", "subjectName": "Informática", "topic": "Segurança da Informação e Ameaças Digitais", "weight": 2.0, "text": "O tipo de software malicioso (malware) que sequestra dados e arquivos do computador mediante criptografia e exige o pagamento de um resgate financeiro para fornecer a chave de descriptografia denomina-se:", "options": ["Spyware.", "Ransomware.", "Adware.", "Keylogger."], "answer": 1, "explanation": "Ransomware é o malware sequestrador de dados que criptografa os arquivos do usuário ou da instituição e cobra resgate (ransom) para devolver o acesso."}];
+
+let userAnswers = {};
+let timerSeconds = 3 * 3600;
+let timerInterval = null;
+let isSubmitted = false;
+
+function initExam() {
+    renderQuestions();
+    renderNav();
+    startTimer();
+}
+
+function renderQuestions() {
+    const stream = document.getElementById('questions-stream');
+    stream.innerHTML = '';
+    
+    let currentSubject = '';
+
+    examQuestions.forEach((q, idx) => {
+        if (q.subject !== currentSubject) {
+            currentSubject = q.subject;
+            const banner = document.createElement('div');
+            banner.className = 'section-banner';
+            banner.innerHTML = `
+                <h2>
+                    <span>` + q.subjectName + `</span>
+                    <span class="section-badge">Peso por Questão: ` + q.weight.toFixed(2) + ` pts</span>
+                </h2>
+            `;
+            stream.appendChild(banner);
+        }
+
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = 'q-card-' + q.id;
+
+        const letters = ['A', 'B', 'C', 'D'];
+        let optionsHtml = '';
+
+        q.options.forEach((opt, oIdx) => {
+            optionsHtml += `
+                <label class="option-label" id="label-` + q.id + `-` + oIdx + `" onclick="selectOption(` + q.id + `, ` + oIdx + `)">
+                    <input type="radio" name="question-` + q.id + `" value="` + oIdx + `">
+                    <span><strong>` + letters[oIdx] + `)</strong> ` + opt + `</span>
+                </label>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="q-header">
+                <span class="q-number">Questão ` + q.id + ` <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">• ` + q.topic + `</span></span>
+                <span class="q-weight">Valor: ` + q.weight.toFixed(2) + ` pts</span>
+            </div>
+            <div class="q-text">` + q.text + `</div>
+            <div class="q-options">
+                ` + optionsHtml + `
+            </div>
+            <div class="explanation-box" id="exp-` + q.id + `">
+                <strong>💡 Justificativa Fundatec:</strong><br>
+                ` + q.explanation + `
+            </div>
+        `;
+
+        stream.appendChild(card);
+    });
+}
+
+function renderNav() {
+    const grid = document.getElementById('nav-grid');
+    grid.innerHTML = '';
+
+    examQuestions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.id = 'nav-btn-' + q.id;
+        btn.innerText = q.id;
+        btn.onclick = () => {
+            document.getElementById('q-card-' + q.id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+        grid.appendChild(btn);
+    });
+}
+
+function selectOption(qId, optIdx) {
+    if (isSubmitted) return;
+
+    userAnswers[qId] = optIdx;
+
+    for (let i = 0; i < 4; i++) {
+        const lbl = document.getElementById('label-' + qId + '-' + i);
+        if (lbl) {
+            lbl.classList.remove('selected');
+        }
+    }
+    const selectedLbl = document.getElementById('label-' + qId + '-' + optIdx);
+    if (selectedLbl) {
+        selectedLbl.classList.add('selected');
+        const radio = selectedLbl.querySelector('input');
+        if (radio) radio.checked = true;
+    }
+
+    const navBtn = document.getElementById('nav-btn-' + qId);
+    if (navBtn) {
+        navBtn.classList.add('answered');
+    }
+
+    const count = Object.keys(userAnswers).length;
+    document.getElementById('answered-count').innerText = count + '/45';
+}
+
+function startTimer() {
+    const timerElem = document.getElementById('timer');
+    timerInterval = setInterval(() => {
+        if (timerSeconds <= 0) {
+            clearInterval(timerInterval);
+            finishExam();
+            return;
+        }
+        timerSeconds--;
+        const h = Math.floor(timerSeconds / 3600);
+        const m = Math.floor((timerSeconds % 3600) / 60);
+        const s = timerSeconds % 60;
+        timerElem.innerText = '⏱️ ' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        
+        if (timerSeconds <= 600) {
+            timerElem.classList.add('warning');
+        }
+    }, 1000);
+}
+
+let missedTopics = [];
+
+function finishExam() {
+    if (isSubmitted) return;
+
+    const answeredCount = Object.keys(userAnswers).length;
+    if (answeredCount < 45) {
+        const confirmFinish = confirm('Você respondeu ' + answeredCount + ' de 45 questões. Deseja realmente finalizar o simulado oficial de Tapera?');
+        if (!confirmFinish) return;
+    }
+
+    isSubmitted = true;
+    clearInterval(timerInterval);
+
+    let totalScore = 0;
+    missedTopics = [];
+    let scores = {
+        port: { correct: 0, total: 15, weight: 2.00, points: 0 },
+        logic: { correct: 0, total: 10, weight: 2.50, points: 0 },
+        gerais: { correct: 0, total: 5, weight: 3.00, points: 0 },
+        leg: { correct: 0, total: 10, weight: 2.00, points: 0 },
+        info: { correct: 0, total: 5, weight: 2.00, points: 0 }
+    };
+
+    examQuestions.forEach(q => {
+        const userChoice = userAnswers[q.id];
+        const isCorrect = userChoice === q.answer;
+        const navBtn = document.getElementById('nav-btn-' + q.id);
+        const expBox = document.getElementById('exp-' + q.id);
+
+        if (expBox) expBox.style.display = 'block';
+
+        for (let i = 0; i < 4; i++) {
+            const lbl = document.getElementById('label-' + q.id + '-' + i);
+            if (lbl) {
+                if (i === q.answer) {
+                    lbl.classList.add('correct-ans');
+                } else if (i === userChoice && !isCorrect) {
+                    lbl.classList.add('wrong-ans');
+                }
+            }
+        }
+
+        if (isCorrect) {
+            scores[q.subject].correct++;
+            scores[q.subject].points += q.weight;
+            totalScore += q.weight;
+            if (navBtn) navBtn.className = 'nav-btn correct';
+        } else {
+            missedTopics.push({ id: q.id, subject: q.subjectName, topic: q.topic });
+            if (navBtn) navBtn.className = 'nav-btn incorrect';
+        }
+    });
+
+    document.getElementById('score-port').innerText = scores.port.points.toFixed(2) + ' / 30.00';
+    document.getElementById('acc-port').innerText = scores.port.correct + ' de 15 acertos (' + (scores.port.correct/15*100).toFixed(0) + '%)';
+
+    document.getElementById('score-logic').innerText = scores.logic.points.toFixed(2) + ' / 25.00';
+    document.getElementById('acc-logic').innerText = scores.logic.correct + ' de 10 acertos (' + (scores.logic.correct/10*100).toFixed(0) + '%)';
+
+    document.getElementById('score-gerais').innerText = scores.gerais.points.toFixed(2) + ' / 15.00';
+    document.getElementById('acc-gerais').innerText = scores.gerais.correct + ' de 5 acertos (' + (scores.gerais.correct/5*100).toFixed(0) + '%)';
+
+    document.getElementById('score-leg').innerText = scores.leg.points.toFixed(2) + ' / 20.00';
+    document.getElementById('acc-leg').innerText = scores.leg.correct + ' de 10 acertos (' + (scores.leg.correct/10*100).toFixed(0) + '%)';
+
+    document.getElementById('score-info').innerText = scores.info.points.toFixed(2) + ' / 10.00';
+    document.getElementById('acc-info').innerText = scores.info.correct + ' de 5 acertos (' + (scores.info.correct/5*100).toFixed(0) + '%)';
+
+    document.getElementById('score-total').innerText = totalScore.toFixed(2) + ' / 100.00';
+    const totalCorrect = scores.port.correct + scores.logic.correct + scores.gerais.correct + scores.leg.correct + scores.info.correct;
+    document.getElementById('acc-total').innerText = 'Total: ' + totalCorrect + ' de 45 questões (' + (totalCorrect/45*100).toFixed(1) + '%)';
+
+    const hasZero = scores.port.correct === 0 || scores.logic.correct === 0 || scores.gerais.correct === 0 || scores.leg.correct === 0 || scores.info.correct === 0;
+    const isApproved = totalScore >= 50.00 && !hasZero;
+
+    const badge = document.getElementById('final-status-badge');
+    if (isApproved) {
+        if (totalScore >= 85.00) {
+            badge.className = 'result-status status-pass';
+            badge.innerText = '🏆 APROVADO COM DESEMPENHO TOP 2 (' + totalScore.toFixed(2) + ' pts)';
+        } else {
+            badge.className = 'result-status status-pass';
+            badge.innerText = '✅ APROVADO NA NOTA DE CORTE (' + totalScore.toFixed(2) + ' pts)';
+        }
+    } else {
+        badge.className = 'result-status status-fail';
+        if (hasZero) {
+            badge.innerText = '❌ ELIMINADO: ZEROU UMA DISCIPLINA (' + totalScore.toFixed(2) + ' pts)';
+        } else {
+            badge.innerText = '❌ REPROVADO: ABAIXO DE 50 PONTOS (' + totalScore.toFixed(2) + ' pts)';
+        }
+    }
+
+    let feedbackHtml = "<p><strong>Resumo de Erros por Disciplina:</strong></p><ul style='margin-left: 20px; margin-top: 6px;'>";
+    if (missedTopics.length === 0) {
+        feedbackHtml += "<li>🎉 Gabarito 100% perfeito! Sem tópicos pendentes.</li>";
+    } else {
+        missedTopics.forEach(t => {
+            feedbackHtml += "<li><strong>Q" + t.id + " (" + t.subject + "):</strong> " + t.topic + "</li>";
+        });
+    }
+    feedbackHtml += "</ul>";
+    document.getElementById('analysis-feedback').innerHTML = feedbackHtml;
+
+    const dashboard = document.getElementById('results-dashboard');
+    dashboard.style.display = 'block';
+    dashboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyDiagnostic() {
+    let missedSummary = "";
+    if (missedTopics.length === 0) {
+        missedSummary = "Nenhum erro registrado (100% de acertos).";
+    } else {
+        missedSummary = missedTopics.map(t => `- Q${t.id} [${t.subject}]: ${t.topic}`).join("\n");
+    }
+
+    const report = `RELATÓRIO DE DESEMPENHO DO DIA (Simulado 01 - Tapera/RS - Assistente Administrativo):
+- Língua Portuguesa: ` + document.getElementById('acc-port').innerText + ` (` + document.getElementById('score-port').innerText + `)
+- Matemática / RLM: ` + document.getElementById('acc-logic').innerText + ` (` + document.getElementById('score-logic').innerText + `)
+- Conhecimentos Gerais: ` + document.getElementById('acc-gerais').innerText + ` (` + document.getElementById('score-gerais').innerText + `)
+- Legislação: ` + document.getElementById('acc-leg').innerText + ` (` + document.getElementById('score-leg').innerText + `)
+- Informática: ` + document.getElementById('acc-info').innerText + ` (` + document.getElementById('score-info').innerText + `)
+- NOTA FINAL: ` + document.getElementById('score-total').innerText + `
+- STATUS: ` + document.getElementById('final-status-badge').innerText + `
+
+LISTA DE TÓPICOS ERRADOS PARA O TREINO DE AMANHÃ:
+` + missedSummary + `
+
+Com base nestes erros, monte a bateria adaptativa de amanhã focando especificamente nas minhas fraquezas.`;
+
+    navigator.clipboard.writeText(report).then(() => {
+        const alertBox = document.getElementById('copy-alert');
+        alertBox.style.display = 'block';
+        setTimeout(() => alertBox.style.display = 'none', 5000);
+    });
+}
+
+window.onload = initExam;
+</script>
+</body>
+</html>

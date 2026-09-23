@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#064e3b">
+    <title>Portal de Simulados | Concursos RS</title>
+    <style>
+        :root {
+            --primary: #065f46;
+            --primary-dark: #064e3b;
+            --primary-light: #10b981;
+            --estrela: #1e3a8a;
+            --estrela-dark: #172554;
+            --estrela-light: #3b82f6;
+            --accent: #d97706;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 60px;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(180deg, #064e3b 0%, #0f172a 100%);
+            padding: 24px 20px 18px 20px;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .header-wrap {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .badge-target {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+        }
+
+        p.subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Filter Tabs */
+        .tabs-container {
+            max-width: 680px;
+            margin: 14px auto 0 auto;
+            padding: 0 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .tabs-container::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 14px;
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: #10b981;
+            color: #064e3b;
+            border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .tab-btn.active.estrela-tab {
+            background: #3b82f6;
+            color: #0f172a;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Cards Stream */
+        .content-wrap {
+            max-width: 680px;
+            margin: 16px auto;
+            padding: 0 16px;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 22px 0 10px 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .exam-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .exam-card:active {
+            transform: scale(0.98);
+        }
+
+        .exam-card.tapera-card {
+            border-left: 4px solid var(--primary-light);
+        }
+
+        .exam-card.estrela-card {
+            border-left: 4px solid var(--estrela-light);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .exam-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.35;
+        }
+
+        .card-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        .badge-blue {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .badge-amber {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .exam-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 12px;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .action-link {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tapera-card .action-link { color: #34d399; }
+        .estrela-card .action-link { color: #60a5fa; }
+
+        .info-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .info-box strong { color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-wrap">
+        <div class="badge-target">⚡ Estudo Mobile Rápido</div>
+        <h1>Portal de Simulados</h1>
+        <p class="subtitle">Assistente Administrativo (Tapera/RS) e Auxiliar de Administração (Estrela/RS)</p>
+    </div>
+</header>
+
+<div class="tabs-container">
+    <button class="tab-btn active" onclick="filterCity('all', this)">Todos (9)</button>
+    <button class="tab-btn" onclick="filterCity('tapera', this)">📍 Tapera (5)</button>
+    <button class="tab-btn" onclick="filterCity('estrela', this)">📍 Estrela (4)</button>
+</div>
+
+<div class="content-wrap">
+
+    <!-- TAPERA / FUNDATEC SECTION -->
+    <div id="section-tapera">
+        <div class="section-title">
+            <span>Tapera/RS • FUNDATEC (Assistente Adm)</span>
+            <span style="color: #34d399; font-size: 0.72rem;">R$ 4.281,19</span>
+        </div>
+
+        <a href="src/simulado_tapera_assistente_administrativo_04_retificado.html" class="exam-card tapera-card" data-city="tapera">
+            <div class="card-top">
+                <span class="exam-title">Simulado Oficial 04 (Retificado & Adaptativo)</span>
+                <span class="card-badge badge-amber">⭐ Mais Recente</span>
+            </div>
+            <p class="exam-desc">Foco intensivo: Pitágoras, Volume Espacial, Função Quadrática (Vértice), LIA (Dolo e Prescrição) e Estatuto do Idoso.</p>
+            <div class="card-meta">
+                <span>45 Questões (A-D) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+
+        <a href="src/simulado_tapera_assistente_administrativo_03_retificado.html" class="exam-card tapera-card" data-city="tapera">
+            <div class="card-top">
+                <span class="exam-title">Simulado Oficial 03 (Edital 234/2026 - Retificado)</span>
+                <span class="card-badge badge-green">Retificado</span>
+            </div>
+            <p class="exam-desc">Adequado ao Adendo nº 234: Leis 2.068 e 2.069 de Tapera, Lei Maria da Penha, Estatuto PcD e Igualdade Racial RS.</p>
+            <div class="card-meta">
+                <span>45 Questões (A-D) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+
+        <a href="src/simulado_tapera_assistente_administrativo_03.html" class="exam-card tapera-card" data-city="tapera">
+            <div class="card-top">
+                <span class="exam-title">Simulado Oficial 03 (Versão Base)</span>
+                <span class="card-badge badge-green">Treino 03</span>
+            </div>
+            <p class="exam-desc">Bateria adaptativa focada em concordância com partícula SE, regência de verbos chave e equivalência lógica contrapositiva.</p>
+            <div class="card-meta">
+                <span>45 Questões (A-D) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+
+        <a href="src/simulado_tapera_assistente_administrativo_02.html" class="exam-card tapera-card" data-city="tapera">
+            <div class="card-top">
+                <span class="exam-title">Simulado Oficial 02 (Adaptativo)</span>
+                <span class="card-badge badge-green">Treino 02</span>
+            </div>
+            <p class="exam-desc">Reforço em concordância da partícula SE, regência de verbos chave, eufemismo/metonímia e combinações simples.</p>
+            <div class="card-meta">
+                <span>45 Questões (A-D) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+
+        <a href="src/simulado_tapera_assistente_administrativo_01.html" class="exam-card tapera-card" data-city="tapera">
+            <div class="card-top">
+                <span class="exam-title">Simulado Oficial 01 (Base)</span>
+                <span class="card-badge badge-green">Diagnóstico</span>
+            </div>
+            <p class="exam-desc">Primeira bateria completa: Português (15), RLM (10), Gerais (5), Legislação (10) e Informática (5).</p>
+            <div class="card-meta">
+                <span>45 Questões (A-D) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+    </div>
+
+    <!-- ESTRELA / OBJETIVA SECTION -->
+    <div id="section-estrela">
+        <div class="section-title">
+            <span>Estrela/RS • Instituto Objetiva (Auxiliar Adm)</span>
+            <span style="color: #60a5fa; font-size: 0.72rem;">5 Vagas Imediatas</span>
+        </div>
+
+        <a href="src/simulado_diario_estrela_04.html" class="exam-card estrela-card" data-city="estrela">
+            <div class="card-top">
+                <span class="exam-title">Bateria Adaptativa 04</span>
+                <span class="card-badge badge-blue">Treino 04</span>
+            </div>
+            <p class="exam-desc">Responsabilidade civil objetiva, LAI (recursos), limites da LRF e Ponto de Pedido no almoxarifado.</p>
+            <div class="card-meta">
+                <span>40 Questões (A-E) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+
+        <a href="src/simulado_diario_estrela_03.html" class="exam-card estrela-card" data-city="estrela">
+            <div class="card-top">
+                <span class="exam-title">Bateria Adaptativa 03</span>
+                <span class="card-badge badge-blue">Treino 03</span>
+            </div>
+            <p class="exam-desc">Equivalências lógicas, Padrão Ofício, Teoria das 3 Idades e dispensa da Lei 14.133/2021.</p>
+            <div class="card-meta">
+                <span>40 Questões (A-E) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+
+        <a href="src/simulado_diario_estrela_02.html" class="exam-card estrela-card" data-city="estrela">
+            <div class="card-top">
+                <span class="exam-title">Simulado Diário 02</span>
+                <span class="card-badge badge-blue">Treino 02</span>
+            </div>
+            <p class="exam-desc">Crase com preposição, operações de conjuntos, inventário físico e atos do Poder Executivo.</p>
+            <div class="card-meta">
+                <span>40 Questões (A-E) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+
+        <a href="src/simulado_estrela_auxiliar_administracao.html" class="exam-card estrela-card" data-city="estrela">
+            <div class="card-top">
+                <span class="exam-title">Simulado 01 (Diagnóstico Inicial)</span>
+                <span class="card-badge badge-blue">Marco Zero</span>
+            </div>
+            <p class="exam-desc">Simulado inaugural completo de 40 questões com pesos oficiais de Estrela/RS (Específicos valendo 3,70 cada).</p>
+            <div class="card-meta">
+                <span>40 Questões (A-E) • 100 pts</span>
+                <span class="action-link">Abrir Prova ➔</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="info-box">
+        💡 <strong>Fluxo de Estudo no Celular:</strong> Abra o simulado desejado, responda com o cronômetro ativo e, ao final, toque no botão <em>"Copiar Relatório"</em>. Depois basta colar de volta no chat para calibrarmos os pontos fracos!
+    </div>
+
+</div>
+
+<script>
+function filterCity(city, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active', 'estrela-tab');
+    });
+
+    btn.classList.add('active');
+    if (city === 'estrela') btn.classList.add('estrela-tab');
+
+    const secTapera = document.getElementById('section-tapera');
+    const secEstrela = document.getElementById('section-estrela');
+
+    if (city === 'all') {
+        secTapera.style.display = 'block';
+        secEstrela.style.display = 'block';
+    } else if (city === 'tapera') {
+        secTapera.style.display = 'block';
+        secEstrela.style.display = 'none';
+    } else if (city === 'estrela') {
+        secTapera.style.display = 'none';
+        secEstrela.style.display = 'block';
+    }
+}
+</script>
+
+</body>
+</html>
